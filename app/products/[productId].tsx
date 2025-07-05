@@ -131,7 +131,7 @@ export default function ProductDetailScreen() {
         >
           <Text>+</Text>
         </Pressable>
-        <Pressable style={styles.cartButton}>
+        <Pressable style={styles.cartButton} onPress={() => router.push('../../(tabs)/cart')}>
           <Text>Add To Cart</Text>
         </Pressable>
         <Pressable style={styles.buyButton}>

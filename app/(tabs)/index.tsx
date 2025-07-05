@@ -1,6 +1,7 @@
 // App.js
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, View, Text, Image, TextInput, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { Menu } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
@@ -54,7 +55,17 @@ export default function App() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <Image source={{ uri: 'https://i.ibb.co/ZRK1fCQf/onboardimage.png' }}style={styles.logo} />
+        <View style={styles.container}>
+      <Image
+        source={{ uri: 'https://i.ibb.co/0ytxPkCH/onboardimage-removebg-preview.png' }}
+        style={styles.logo}
+      />
+      <TouchableOpacity onPress={() => console.log('Hamburger pressed')}>
+        <Menu size={28} color="#000" /> 
+      </TouchableOpacity>
+    </View>
+
+
         <TextInput style={styles.search} placeholder="Search Products, Services, etc." />
 
         <Image source={{ uri: 'https://i.ibb.co/NgqqGZnr/Banner.png' }}  style={styles.banner} />
@@ -86,7 +97,7 @@ export default function App() {
           renderItem={({ item }) => (
             <TouchableOpacity 
               style={styles.card}
-              onPress={() => router.push('/products')}
+              onPress={() => router.push('/products/[productId]')}
             >
               <Image source={item.image} style={styles.image} />
               <Text>{item.title}</Text>
@@ -179,35 +190,39 @@ export default function App() {
 <Image source={{ uri: 'https://i.ibb.co/9mrbhCst/banner-food.jpg' }} style={styles.banner} />
         <Text style={styles.sectionTitle}>READING LIST</Text>
 
-
-       {[1, 2, 3].map(id => (
+{[1, 2, 3].map(id => (
   <View key={id} style={styles.blogCardLast}>
     <Image
-      source={{ uri: 'https://via.placeholder.com/150' }} // Replace with actual image URL
+      source={{ uri: 'https://i.ibb.co/v4v0PBNh/900849e5dc665c8f2363c0dc678c6962b77a5069.jpg' }} // Update with actual image URL
       style={styles.blogImage}
     />
     <View style={styles.blogContent}>
       <View style={styles.blogMeta}>
-        <Text style={styles.blogDate}>📅 14th April, 2025</Text>
-        <Text style={styles.blogCategory}> | Design</Text>
+        <Text style={styles.blogDate}>14TH APRIL, 2025</Text>
+        <Text style={styles.blogCategory}>  |  DESIGN</Text>
       </View>
+
       <Text style={styles.blogTitle}>
         LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ELIT ...
       </Text>
+
       <View style={styles.blogFooter}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/40' }} // Profile Image
+          source={{ uri: 'https://via.placeholder.com/40' }}
           style={styles.authorImage}
         />
         <View style={styles.authorInfo}>
           <Text style={styles.authorName}>JOHN DOE</Text>
           <Text style={styles.blogDetails}>2 Days Ago • 5 Min Read</Text>
         </View>
-        <Text style={styles.bookmark}>🔖</Text>
+        <TouchableOpacity>
+          <Text style={styles.bookmark}>🔖</Text>
+        </TouchableOpacity>
       </View>
     </View>
   </View>
 ))}
+
 
 
         <TouchableOpacity onPress={() => AsyncStorage.removeItem('onboardingCompleted')}>
@@ -219,6 +234,14 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+   container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    // paddingHorizontal: 10,
+    // paddingVertical: 5,
+    // backgroundColor: '#fff', 
+  },
   search: {
     margin: 10,
     borderColor: '#ccc',
@@ -228,7 +251,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 200,
-    height: 91,
+    height: 60,
     alignSelf: 'center',
     resizeMode: 'contain',
   },
@@ -334,67 +357,71 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
   },
-   blogCardLast: {
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: '#000',
-    marginVertical: 8,
-    // borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#fff', // White background
-  },
-  blogImage: {
-    width: 130,
-    height: '100%',
-  },
-  blogContent: {
-    flex: 1,
-    padding: 10,
-    justifyContent: 'space-between',
-  },
-  blogMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  blogDate: {
-    color: '#000', // Black text
-    fontSize: 12,
-  },
-  blogCategory: {
-    color: '#000',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  blogTitle: {
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: '#000',
-    marginVertical: 5,
-  },
-  blogFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  authorImage: {
-    width: 35,
-    height: 35,
-    borderRadius: 17.5,
-    marginRight: 10,
-  },
+blogCardLast: {
+  flexDirection: 'row',
+  backgroundColor: '#fff', // white background
+  borderWidth: 1,
+  borderColor: '#ddd',
+  marginHorizontal: 10,
+  marginBottom: 15,
+  borderRadius: 6,
+  overflow: 'hidden',
+},
+blogImage: {
+  width: 140,
+  height: 130,
+  resizeMode: 'cover',
+},
+blogContent: {
+  flex: 1,
+  padding: 10,
+  justifyContent: 'space-between',
+},
+blogMeta: {
+  flexDirection: 'row',
+  marginBottom: 6,
+},
+blogDate: {
+  fontSize: 12,
+  color: '#333',
+},
+blogCategory: {
+  fontSize: 12,
+  color: '#333',
+  fontWeight: '500',
+  marginLeft: 4,
+},
+blogTitle: {
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#111',
+  marginBottom: 8,
+},
+blogFooter: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+authorImage: {
+  width: 30,
+  height: 30,
+  borderRadius: 15,
+  marginRight: 8,
+},
+authorName: {
+  fontSize: 12,
+  fontWeight: 'bold',
+  color: '#00ADEF',
+},
+blogDetails: {
+  fontSize: 11,
+  color: '#777',
+},
+bookmark: {
+  fontSize: 16,
+  color: '#FFA500',
+},
   authorInfo: {
     flex: 1,
-  },
-  authorName: {
-    color: '#00CFFF', // Highlighted color
-    fontWeight: 'bold',
-  },
-  blogDetails: {
-    color: '#555', // Dark grey for subtler text
-    fontSize: 12,
-  },
-  bookmark: {
-    fontSize: 18,
-    color: 'orange',
-  },
+  }
   
 });
