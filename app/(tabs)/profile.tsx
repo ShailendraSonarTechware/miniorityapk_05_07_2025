@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { router } from 'expo-router';
 import { Settings, Share, Bell, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
 
 export default function ProfileTab() {
@@ -16,7 +17,7 @@ export default function ProfileTab() {
     { icon: Share, label: 'Share App', action: () => {} },
     { icon: Bell, label: 'Notifications', action: () => {} },
     { icon: HelpCircle, label: 'Help & Support', action: () => {} },
-    { icon: LogOut, label: 'Sign Out', action: () => {}, destructive: true },
+    { icon: LogOut, label: 'Sign Out', action: () => router.push('../../onboarding/Onboarding1'),destructive: true },
   ];
 
   return (
@@ -36,7 +37,7 @@ export default function ProfileTab() {
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>234</Text>
-            <Text style={styles.statLabel}>Photos Liked</Text>
+            <Text style={styles.statLabel}> Liked</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>18</Text>
@@ -73,7 +74,7 @@ export default function ProfileTab() {
         <View style={styles.appInfo}>
           <Text style={styles.appVersion}>Version 1.0.0</Text>
           <Text style={styles.appDescription}>
-            Discover and save beautiful images from around the world
+            Discover and save 
           </Text>
         </View>
       </ScrollView>

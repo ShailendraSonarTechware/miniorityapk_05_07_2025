@@ -136,6 +136,7 @@ export default function HomeTab() {
             style={styles.saleImage} 
           />
         </View>
+        {/* <Image source={{ uri: 'https://i.ibb.co/NgqqGZnr/Banner.png' }}  style={styles.banner} /> */}
 
         {/* Best Selling Products */}
         <View style={styles.section}>
@@ -202,6 +203,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+   banner: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
   },
   content: {
     flex: 1,
