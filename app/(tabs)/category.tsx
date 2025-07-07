@@ -8,7 +8,8 @@ import {
   Image,
   SafeAreaView,
 } from 'react-native';
-
+import { useRouter } from 'expo-router'; 
+import { useNavigation } from '@react-navigation/native';
 // 1. Define allowed section keys
 type SectionKey = 'products' | 'services' | 'restaurants' | 'business';
 
@@ -62,6 +63,8 @@ const categories: Record<SectionKey, { name: string; icon: string }[]> = {
 
 export default function CategoryScreen() {
   const [activeSection, setActiveSection] = useState<SectionKey>('products');
+const router = useRouter(); 
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -96,7 +99,7 @@ export default function CategoryScreen() {
           <ScrollView>
             <View style={styles.grid}>
               {categories[activeSection]?.map((item, index) => (
-                <TouchableOpacity key={index} style={styles.card}>
+                <TouchableOpacity key={index} style={styles.card} onPress={() => router.push('/components/ServiceCategory')} >
                   <Image source={{ uri: item.icon }} style={styles.cardIcon} />
                   <Text style={styles.cardText}>{item.name}</Text>
                 </TouchableOpacity>
