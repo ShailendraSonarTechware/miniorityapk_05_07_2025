@@ -127,6 +127,9 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+
+       
+
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.back()} >
@@ -184,9 +187,15 @@ export default function HomeScreen() {
         </ScrollView>
 
         {/* Services List */}
-        <View style={styles.servicesContainer}>
-          {services.map(renderServiceCard)}
-        </View>
+<View style={styles.servicesContainer}>
+  {services.map((service, index) => (
+    <TouchableOpacity 
+      key={index} 
+      onPress={() => router.push('./ServiceDetail')}>
+      {renderServiceCard(service)}
+    </TouchableOpacity>
+  ))}
+</View>
 
         {/* Vendors Section */}
         <View style={styles.vendorsSection}>
