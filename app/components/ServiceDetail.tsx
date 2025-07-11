@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { ChevronLeft, Heart, Star, CreditCard as Edit3, Share2, Copy, Phone, MapPin, Globe, Clock, Check, Plus, Minus } from 'lucide-react-native';
 import SearchHeader from './SearchHeader';
+import BookingModal from './BookingModal';
 
 const { width } = Dimensions.get('window');
 
@@ -40,6 +41,7 @@ export default function ServiceDetail() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+   const [isBookingVisible, setBookingVisible] = useState(false);
 
   const images = [
     'https://images.pexels.com/photos/3757942/pexels-photo-3757942.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -152,10 +154,15 @@ export default function ServiceDetail() {
           <Image source={{ uri: images[selectedImageIndex] }} style={styles.mainImage} />
         </View>
 
-        {/* Book Now Button */}
-        <TouchableOpacity style={styles.bookButton}>
-          <Text style={styles.bookButtonText}>Book Now</Text>
-        </TouchableOpacity>
+        <View>
+      {/* Book Now Button */}
+      <TouchableOpacity style={styles.bookButton} onPress={() => setBookingVisible(true)}>
+        <Text style={styles.bookButtonText}>Book Now</Text>
+      </TouchableOpacity>
+
+      {/* Booking Modal */}
+      <BookingModal visible={isBookingVisible} onClose={() => setBookingVisible(false)} />
+    </View>
 
         {/* Service Info */}
         <View style={styles.serviceInfo}>
