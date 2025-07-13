@@ -10,7 +10,8 @@ const SearchHeader = () => {
 
   return (
     <SafeAreaView style={{ backgroundColor: '#fff' }}>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* <View style={[styles.container, { paddingTop: insets.top }]}> */}
+      <View style={[styles.container]}> {/*upper line is same*/}
         <TouchableOpacity onPress={() => router.back()} style={styles.iconLeft}>
           <ChevronLeft size={22} color="#000" />
         </TouchableOpacity>
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   iconLeft: {
     marginRight: 10,
@@ -43,11 +44,12 @@ const styles = StyleSheet.create({
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#aaa',
+    borderColor: '#d9d9d9',
     borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    borderRadius: 2,
+    paddingHorizontal: 6,
+    // paddingVertical: 6,
+    height: 40,
     flex: 1,
   },
   input: {
