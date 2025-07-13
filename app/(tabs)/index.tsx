@@ -146,7 +146,14 @@ export default function App() {
 
         <Image source={{ uri: 'https://i.ibb.co/zVwK4P8Z/beauty-salon-banner.jpg' }} style={styles.banner} />
 
-        <Text style={styles.sectionTitle}>FOOD PRODUCTS</Text>
+        
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>FOOD PRODUCTS</Text>
+          <TouchableOpacity onPress={() => router.push('/food-listing')}>
+            <Text style={styles.viewAllText}>View All</Text>
+          </TouchableOpacity>
+        </View>
         <FlatList
           horizontal
           data={food_products}
@@ -351,6 +358,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
+    marginBottom: 20,
   },
   vendorLogo: {
     width: 80,

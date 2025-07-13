@@ -1,19 +1,19 @@
 import { Tabs } from 'expo-router';
 import {  Home, Search, Heart, User, ShoppingBag } from 'lucide-react-native';
-
+import { Ionicons } from '@expo/vector-icons';
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#E07B39',
+        tabBarActiveTintColor: '#16a1c0',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
-          backgroundColor: 'Black',
+          backgroundColor: '#000',
           borderTopWidth: 1,
           borderTopColor: '#E5E7EB',
-          paddingTop: 8,
-          paddingBottom: 8,
+          paddingTop: 4,
+          paddingBottom: 4,
           height: 65,
         },
         tabBarLabelStyle: {
@@ -37,7 +37,7 @@ export default function TabLayout() {
         options={{
           title: 'Category',
           tabBarIcon: ({ size, color }) => (
-            <Heart size={size} color={color} />
+            <Ionicons name="pricetags" size={24} color={color}/>
           ),
         }}
       />
@@ -46,7 +46,8 @@ export default function TabLayout() {
         options={{
           title: 'Cart',
           tabBarIcon: ({ size, color }) => (
-            <ShoppingBag size={size} color={color} />
+            // <ShoppingBag size={size} color={color} />
+            <Ionicons name="cart" size={24} color={color} />
           ),
         }}
       />
@@ -59,6 +60,11 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      <Tabs.Screen
+  name="food-listing"
+  options={{ href: null }} // hides tab icon but keeps it in tab layout
+/>
       
     </Tabs>
   );
