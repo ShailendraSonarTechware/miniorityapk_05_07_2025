@@ -1,0 +1,268 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  ImageBackground,
+  Pressable 
+} from 'react-native';
+import {
+  MaterialIcons,
+  Feather,
+  FontAwesome,
+  AntDesign,
+  Entypo,
+  Ionicons,
+} from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+export default function AccountSettingsScreen() {
+  const insets = useSafeAreaInsets();
+const router = useRouter();
+  const user = {
+    name: 'John Doe',
+    email: 'johndoe@gmail.com',
+    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+    background:
+      'https://i.ibb.co/WvCN074r/8adbb0c5a13e14b47fd390cac8d8921e819ca1ec.jpg',
+  };
+
+  const navigationItems = [
+    {
+      title: 'ORDERS & BOOKING',
+      items: [
+        { icon: <Feather name="user" size={20} />, label: 'My Account' ,route: '/my-account',},
+        {
+          icon: <FontAwesome name="shopping-cart" size={20} />,
+          label: 'My Orders',
+          route: '/my-account'
+        },
+        { icon: <FontAwesome name="money" size={20} />, label: 'Payments', route: '/my-account' },
+        { icon: <AntDesign name="hearto" size={20} />, label: 'Wishlist', route: '/my-account' },
+        {
+          icon: <MaterialIcons name="autorenew" size={20} />,
+          label: 'Return & Refund Status',
+          route: '/my-account'
+        },
+        { icon: <Entypo name="bookmark" size={20} />, label: 'My Bookings' , route: '/my-account'},
+      ],
+    },
+    {
+      title: 'OTHER SETTINGS',
+      items: [
+        {
+          icon: <Entypo name="help-with-circle" size={20} />,
+          label: 'Contact Us',
+           route: '/my-account'
+        },
+        { icon: <AntDesign name="questioncircleo" size={20} />, label: 'FAQ',  route: '/my-account' },
+        { icon: <Feather name="headphones" size={20} />, label: 'Support' ,  route: '/my-account'},
+        {
+          icon: <Ionicons name="document-text-outline" size={20} />,
+          label: 'Terms & Conditions',
+           route: '/my-account'
+        },
+        {
+          icon: <Ionicons name="shield-checkmark-outline" size={20} />,
+          label: 'Privacy Policy',
+           route: '/my-account'
+        },
+      ],
+    },
+  ];
+
+ return (
+  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    {/* Header Section (not inside ScrollView) */}
+    <View style={{ position: 'relative' }}>
+      {/* Background */}
+      <View style={styles.backgroundWrapper}>
+        <ImageBackground
+          source={{ uri: user.background }}
+          style={styles.bgImage}
+        >
+          <TouchableOpacity
+            style={[styles.backButton, { top: insets.top + 8 }]}
+          >
+            <AntDesign name="arrowleft" size={20} color="#000" />
+          </TouchableOpacity>
+        </ImageBackground>
+      </View>
+
+      {/* Floating Avatar */}
+      <View style={styles.avatarWrapper}>
+        <View style={styles.profileOuter}>
+          <View style={styles.profileInner}>
+            <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          </View>
+        </View>
+      </View>
+
+      {/* Black Bar */}
+      <View style={styles.blackBar}>
+        <View style={styles.info}>
+          <Text style={styles.name}>{user.name}</Text>
+          <View style={styles.emailRow}>
+            <MaterialIcons name="edit" size={14} color="#f4a426" />
+            <Text style={styles.email}>{user.email}</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+
+    {/* Scrollable Content */}
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 8 }}>
+      {navigationItems.map((section, index) => (
+        <View key={index}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+          {section.items.map((item, idx) => (
+  <Pressable
+    key={idx}
+    // onPress={() => item.route && router.push(item.route)}
+    style={({ pressed }) => [
+      styles.item,
+      pressed && { backgroundColor: '#eaeaea' },
+    ]}
+  >
+    <View style={styles.itemLeft}>
+      {item.icon}
+      <Text style={styles.itemText}>{item.label}</Text>
+    </View>
+    <Feather name="chevron-right" size={20} color="#555" />
+  </Pressable>
+))}
+        </View>
+      ))}
+
+      {/* Logout Button */}
+      <TouchableOpacity style={styles.logoutBtn}>
+        <Feather name="power" size={20} color="#000" />
+        <Text style={styles.logoutText}>Log Out</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  </View>
+);
+
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+  },
+  backgroundWrapper: {
+    height: 120, // 👈 Fixed height for background
+    width: '100%',
+  },
+  bgImage: {
+    width: '100%',
+    height: 220,
+    resizeMode: 'cover',
+    justifyContent: 'flex-end',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 15,
+    padding: 6,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    zIndex: 2,
+  },
+  blackBar: {
+    marginTop: 40,
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  },
+  avatarWrapper: {
+    position: 'absolute',
+    top: 120, // 👈 overlaps background & black bar
+    left: 16,
+    zIndex: 3,
+  },
+  profileOuter: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#aaa',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInner: {
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    borderWidth: 2,
+    borderColor: '#fff',
+    overflow: 'hidden',
+  },
+  avatar: {
+    width: '100%',
+    height: '100%',
+  },
+  info: {
+    marginLeft: 'auto', // pushes it to the right
+    alignItems: 'flex-end',
+  },
+  name: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  emailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  email: {
+    marginLeft: 6,
+    color: '#f4a426',
+    fontSize: 14,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginVertical: 16,
+  },
+  item: {
+    backgroundColor: '#f9f9f9',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  itemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemText: {
+    marginLeft: 12,
+    fontSize: 15,
+  },
+  logoutBtn: {
+    marginTop: 24,
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 2,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 40,
+  },
+  logoutText: {
+    marginLeft: 8,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+});

@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import {  Home, Search, Heart, User, ShoppingBag } from 'lucide-react-native';
+import {  Home, Search, Heart, User, ShoppingBag, Settings } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 export default function TabLayout() {
   return (
@@ -57,6 +57,15 @@ export default function TabLayout() {
           title: 'profile',
           tabBarIcon: ({ size, color }) => (
             <User size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="setting"
+        options={{
+          title: 'Setting',
+          tabBarIcon: ({ size, color }) => (
+            <Settings size={size} color={color} />
           ),
         }}
       />
