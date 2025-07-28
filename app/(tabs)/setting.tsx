@@ -163,9 +163,10 @@ export default function AccountSettingsScreen() {
                   // router.push('../components/MyAccount');
                   router.push(item.route);
                 }}
-                style={({ pressed }) => [
+                style={({ pressed, hovered }) => [
                   styles.item,
-                  pressed && { backgroundColor: '#eaeaea' },
+                  // hovered && { backgroundColor: '#961f1fff' }, // hover color for web
+                  pressed && { backgroundColor: '#16a1c0' ,color: '#ffffff'}, // press color
                 ]}
               >
                 <View style={styles.itemLeft}>
@@ -224,7 +225,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 120, // 👈 overlaps background & black bar
     left: 16,
-    zIndex: 3,  },
+    zIndex: 3,
+  },
   profileOuter: {
     width: 72,
     height: 72,
