@@ -74,6 +74,10 @@ export default function TabLayout() {
   name="food-listing"
   options={{ href: null }} // hides tab icon but keeps it in tab layout
 />
+<Tabs.Screen
+  name="MyAccount"
+  options={{ href: null }} // hides tab icon but keeps it in tab layout
+/>
       
     </Tabs>
   );

@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
   ImageBackground,
-  Pressable 
+  Pressable,
 } from 'react-native';
 import {
   MaterialIcons,
@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 export default function AccountSettingsScreen() {
   const insets = useSafeAreaInsets();
-const router = useRouter();
+  const router = useRouter();
   const user = {
     name: 'John Doe',
     email: 'johndoe@gmail.com',
@@ -29,25 +29,51 @@ const router = useRouter();
     background:
       'https://i.ibb.co/WvCN074r/8adbb0c5a13e14b47fd390cac8d8921e819ca1ec.jpg',
   };
+  interface NavItem {
+    icon: React.ReactNode;
+    label: string;
+    route: string;
+  }
 
-  const navigationItems = [
+  interface NavSection {
+    title: string;
+    items: NavItem[];
+  }
+
+  const navigationItems: NavSection[] = [
     {
       title: 'ORDERS & BOOKING',
       items: [
-        { icon: <Feather name="user" size={20} />, label: 'My Account' ,route: '/my-account',},
+        {
+          icon: <Feather name="user" size={20} />,
+          label: 'My Account',
+          route: '/MyAccount',
+        },
         {
           icon: <FontAwesome name="shopping-cart" size={20} />,
           label: 'My Orders',
-          route: '/my-account'
+          route: '/MyAccount',
         },
-        { icon: <FontAwesome name="money" size={20} />, label: 'Payments', route: '/my-account' },
-        { icon: <AntDesign name="hearto" size={20} />, label: 'Wishlist', route: '/my-account' },
+        {
+          icon: <FontAwesome name="money" size={20} />,
+          label: 'Payments',
+          route: '/MyAccount',
+        },
+        {
+          icon: <AntDesign name="hearto" size={20} />,
+          label: 'Wishlist',
+          route: '/MyAccount',
+        },
         {
           icon: <MaterialIcons name="autorenew" size={20} />,
           label: 'Return & Refund Status',
-          route: '/my-account'
+          route: '/MyAccount',
         },
-        { icon: <Entypo name="bookmark" size={20} />, label: 'My Bookings' , route: '/my-account'},
+        {
+          icon: <Entypo name="bookmark" size={20} />,
+          label: 'My Bookings',
+          route: '/MyAccount',
+        },
       ],
     },
     {
@@ -56,96 +82,110 @@ const router = useRouter();
         {
           icon: <Entypo name="help-with-circle" size={20} />,
           label: 'Contact Us',
-           route: '/my-account'
+          route: '/MyAccount',
         },
-        { icon: <AntDesign name="questioncircleo" size={20} />, label: 'FAQ',  route: '/my-account' },
-        { icon: <Feather name="headphones" size={20} />, label: 'Support' ,  route: '/my-account'},
+        {
+          icon: <AntDesign name="questioncircleo" size={20} />,
+          label: 'FAQ',
+          route: '/MyAccount',
+        },
+        {
+          icon: <Feather name="headphones" size={20} />,
+          label: 'Support',
+          route: '/MyAccount',
+        },
         {
           icon: <Ionicons name="document-text-outline" size={20} />,
           label: 'Terms & Conditions',
-           route: '/my-account'
+          route: '/MyAccount',
         },
         {
           icon: <Ionicons name="shield-checkmark-outline" size={20} />,
           label: 'Privacy Policy',
-           route: '/my-account'
+          route: '/MyAccount',
         },
       ],
     },
   ];
 
- return (
-  <View style={{ flex: 1, backgroundColor: '#fff' }}>
-    {/* Header Section (not inside ScrollView) */}
-    <View style={{ position: 'relative' }}>
-      {/* Background */}
-      <View style={styles.backgroundWrapper}>
-        <ImageBackground
-          source={{ uri: user.background }}
-          style={styles.bgImage}
-        >
-          <TouchableOpacity
-            style={[styles.backButton, { top: insets.top + 8 }]}
+  return (
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      {/* Header Section (not inside ScrollView) */}
+      <View style={{ position: 'relative' }}>
+        {/* Background */}
+        <View style={styles.backgroundWrapper}>
+          <ImageBackground
+            source={{ uri: user.background }}
+            style={styles.bgImage}
           >
-            <AntDesign name="arrowleft" size={20} color="#000" />
-          </TouchableOpacity>
-        </ImageBackground>
-      </View>
+            <TouchableOpacity
+              style={[styles.backButton, { top: insets.top + 8 }]}
+            >
+              <AntDesign name="arrowleft" size={20} color="#000" />
+            </TouchableOpacity>
+          </ImageBackground>
+        </View>
 
-      {/* Floating Avatar */}
-      <View style={styles.avatarWrapper}>
-        <View style={styles.profileOuter}>
-          <View style={styles.profileInner}>
-            <Image source={{ uri: user.avatar }} style={styles.avatar} />
+        {/* Floating Avatar */}
+        <View style={styles.avatarWrapper}>
+          <View style={styles.profileOuter}>
+            <View style={styles.profileInner}>
+              <Image source={{ uri: user.avatar }} style={styles.avatar} />
+            </View>
+          </View>
+        </View>
+
+        {/* Black Bar */}
+        <View style={styles.blackBar}>
+          <View style={styles.info}>
+            <Text style={styles.name}>{user.name}</Text>
+            <View style={styles.emailRow}>
+              <MaterialIcons name="edit" size={14} color="#f4a426" />
+              <Text style={styles.email}>{user.email}</Text>
+            </View>
           </View>
         </View>
       </View>
 
-      {/* Black Bar */}
-      <View style={styles.blackBar}>
-        <View style={styles.info}>
-          <Text style={styles.name}>{user.name}</Text>
-          <View style={styles.emailRow}>
-            <MaterialIcons name="edit" size={14} color="#f4a426" />
-            <Text style={styles.email}>{user.email}</Text>
+      {/* Scrollable Content */}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingTop: 8 }}
+      >
+        {navigationItems.map((section, index) => (
+          <View key={index}>
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+            {section.items.map((item: any, idx) => (
+              <Pressable
+                key={idx}
+                onPress={() => {
+                  console.log('Navigating to:', item.route);
+                  // router.push('../components/MyAccount');
+                  router.push(item.route);
+                }}
+                style={({ pressed }) => [
+                  styles.item,
+                  pressed && { backgroundColor: '#eaeaea' },
+                ]}
+              >
+                <View style={styles.itemLeft}>
+                  {item.icon}
+                  <Text style={styles.itemText}>{item.label}</Text>
+                </View>
+                <Feather name="chevron-right" size={20} color="#555" />
+              </Pressable>
+            ))}
           </View>
-        </View>
-      </View>
+        ))}
+
+        {/* Logout Button */}
+        <TouchableOpacity style={styles.logoutBtn}>
+          <Feather name="power" size={20} color="#000" />
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
-
-    {/* Scrollable Content */}
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 8 }}>
-      {navigationItems.map((section, index) => (
-        <View key={index}>
-          <Text style={styles.sectionTitle}>{section.title}</Text>
-          {section.items.map((item, idx) => (
-  <Pressable
-    key={idx}
-    // onPress={() => item.route && router.push(item.route)}
-    style={({ pressed }) => [
-      styles.item,
-      pressed && { backgroundColor: '#eaeaea' },
-    ]}
-  >
-    <View style={styles.itemLeft}>
-      {item.icon}
-      <Text style={styles.itemText}>{item.label}</Text>
-    </View>
-    <Feather name="chevron-right" size={20} color="#555" />
-  </Pressable>
-))}
-        </View>
-      ))}
-
-      {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutBtn}>
-        <Feather name="power" size={20} color="#000" />
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
-    </ScrollView>
-  </View>
-);
-
+  );
 }
 
 const styles = StyleSheet.create({
@@ -184,8 +224,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 120, // 👈 overlaps background & black bar
     left: 16,
-    zIndex: 3,
-  },
+    zIndex: 3,  },
   profileOuter: {
     width: 72,
     height: 72,
