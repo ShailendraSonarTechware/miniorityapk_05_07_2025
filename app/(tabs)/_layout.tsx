@@ -1,5 +1,12 @@
 import { Tabs } from 'expo-router';
-import {  Home, Search, Heart, User, ShoppingBag, Settings } from 'lucide-react-native';
+import {
+  Home,
+  Search,
+  Heart,
+  User,
+  ShoppingBag,
+  Settings,
+} from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 export default function TabLayout() {
   return (
@@ -21,23 +28,22 @@ export default function TabLayout() {
           fontWeight: '500',
           marginTop: 4,
         },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ size, color }) => (
-            <Home size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
       />
-      
+
       <Tabs.Screen
         name="category"
         options={{
           title: 'Category',
           tabBarIcon: ({ size, color }) => (
-            <Ionicons name="pricetags" size={24} color={color}/>
+            <Ionicons name="pricetags" size={24} color={color} />
           ),
         }}
       />
@@ -51,15 +57,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'profile',
-          tabBarIcon: ({ size, color }) => (
-            <User size={size} color={color} />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name="setting"
         options={{
@@ -71,14 +69,23 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-  name="food-listing"
-  options={{ href: null }} // hides tab icon but keeps it in tab layout
-/>
-<Tabs.Screen
-  name="MyAccount"
-  options={{ href: null }} // hides tab icon but keeps it in tab layout
-/>
-      
+        name="food-listing"
+        options={{ href: null }} // hides tab icon but keeps it in tab layout
+      />
+      <Tabs.Screen
+        name="MyAccount"
+        options={{ href: null }} // hides tab icon but keeps it in tab layout
+      />
+      <Tabs.Screen
+        name="profile"
+        // options={{
+        //   title: 'profile',
+        //   tabBarIcon: ({ size, color }) => (
+        //     <User size={size} color={color} />
+        //   ),
+        // }}
+        options={{ href: null }}
+      />
     </Tabs>
   );
 }

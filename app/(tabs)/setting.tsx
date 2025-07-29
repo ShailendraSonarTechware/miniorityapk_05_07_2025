@@ -40,6 +40,21 @@ export default function AccountSettingsScreen() {
     items: NavItem[];
   }
 
+  const handleLogout = async () => {
+    try {
+      // 1. Clear async storage or token
+      // await AsyncStorage.removeItem('authToken'); // or your token key
+
+      // 2. Optionally clear any global user state
+      // dispatch({ type: 'LOGOUT' }); // if using context/redux
+
+      // 3. Navigate to login screen
+      router.replace('../../onboarding/Onboarding1'); // or your login route
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   const navigationItems: NavSection[] = [
     {
       title: 'ORDERS & BOOKING',
@@ -166,7 +181,7 @@ export default function AccountSettingsScreen() {
                 style={({ pressed, hovered }) => [
                   styles.item,
                   // hovered && { backgroundColor: '#961f1fff' }, // hover color for web
-                  pressed && { backgroundColor: '#16a1c0' ,color: '#ffffff'}, // press color
+                  pressed && { backgroundColor: '#16a1c0', color: '#ffffff' }, // press color
                 ]}
               >
                 <View style={styles.itemLeft}>
@@ -180,7 +195,7 @@ export default function AccountSettingsScreen() {
         ))}
 
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutBtn}>
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Feather name="power" size={20} color="#000" />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
@@ -201,7 +216,7 @@ const styles = StyleSheet.create({
   },
   bgImage: {
     width: '100%',
-    height: 220,
+    height: 200,
     resizeMode: 'cover',
     justifyContent: 'flex-end',
   },
