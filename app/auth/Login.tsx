@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,69 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../utils/api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [keepSignedIn, setKeepSignedIn] = useState(false);
+  const [loading, setLoading] = useState(false);  // Added loading state
+  const [error, setError] = useState('');  // Added error state
 
-  const handleLogin = () => {
-    // TODO: validate credentials
-    router.replace('/(tabs)');
+  // Function to handle login
+  const handleLogin = useCallback(async () => {
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return; // Prevent navigation if email or password is missing
+    }
+
+    setLoading(true);
+    setError(''); // Reset error before making the API call
+
+    try {
+      const res = await api.post('/users/login', { email, password });
+      if (res.status === 200) {
+        // Assuming successful login
+        await AsyncStorage.setItem('authToken', res.data.token);
+        
+        // Delay navigation slightly to ensure state is set
+        setTimeout(() => {
+          router.replace('/(tabs)');
+        }, 200);
+        console.log("Login successful!");
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError('Login failed. Please check your credentials.');
+      } else {
+        setError('An unexpected error occurred.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [email, password]);
+
+  // Function to check authentication status
+  const checkAuth = async () => {
+    const authToken = await AsyncStorage.getItem('authToken');
+    if (authToken) {
+      // User is logged in, proceed to main content
+      router.replace('/(tabs)');
+    } else {
+      // User is not logged in, navigate to the login screen
+      router.push('/auth/Login');
+    }
   };
+
+  useEffect(() => {
+    // Run checkAuth only when loading is false
+    // if (!loading) {
+    //   checkAuth();
+    // }
+  }, []);  // Trigger when loading state changes
 
   return (
     <View style={styles.container}>
@@ -35,6 +88,7 @@ export default function Login() {
         placeholder="Enter your email"
         value={email}
         onChangeText={setEmail}
+        editable={!loading}  // Disable input while loading
       />
 
       <Text style={styles.label}>Password</Text>
@@ -44,11 +98,14 @@ export default function Login() {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        editable={!loading}  // Disable input while loading
       />
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
 
       <View style={styles.inline}>
         <View style={styles.checkboxContainer}>
-          <TouchableOpacity onPress={() => setKeepSignedIn(!keepSignedIn)} style={styles.fakeCheckbox}>
+          <TouchableOpacity onPress={() => setKeepSignedIn(!keepSignedIn)} style={styles.fakeCheckbox} disabled={loading}>
             <MaterialIcons
               name={keepSignedIn ? 'check-box' : 'check-box-outline-blank'}
               size={20}
@@ -57,16 +114,20 @@ export default function Login() {
           </TouchableOpacity>
           <Text style={styles.checkboxLabel}>Keep Me Signed In</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push('/auth/ForgotPassword')}>
+        <TouchableOpacity onPress={() => router.push('/auth/ForgotPassword')} disabled={loading}>
           <Text style={styles.forgot}>Forget Password</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.signInBtn} onPress={handleLogin}>
-        <Text style={styles.signInText}>Sign In</Text>
+      <TouchableOpacity
+        style={styles.signInBtn}
+        onPress={handleLogin}
+        disabled={loading} // Disable button during loading
+      >
+        <Text style={styles.signInText}>{loading ? 'Logging in...' : 'Sign In'}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/auth/Signup')}>
+      <TouchableOpacity onPress={() => router.push('/auth/Signup')} disabled={loading}>
         <Text style={styles.link}>
           New Customer? <Text style={styles.underline}>Create Account</Text>
         </Text>
@@ -94,7 +155,7 @@ const styles = StyleSheet.create({
   },
   backArrow: {
     fontSize: 24,
-    color: 'black'
+    color: 'black',
   },
   header: {
     fontSize: 28,
@@ -172,5 +233,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: '#f2f2f2',
     marginHorizontal: 12,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
