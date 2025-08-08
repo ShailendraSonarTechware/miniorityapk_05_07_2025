@@ -77,6 +77,10 @@ export default function TabLayout() {
         options={{ href: null }} // hides tab icon but keeps it in tab layout
       />
       <Tabs.Screen
+        name="MyOrders"
+        options={{ href: null }} // hides tab icon but keeps it in tab layout
+      />
+      <Tabs.Screen
         name="profile"
         // options={{
         //   title: 'profile',

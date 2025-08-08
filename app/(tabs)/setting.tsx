@@ -67,7 +67,7 @@ export default function AccountSettingsScreen() {
         {
           icon: <FontAwesome name="shopping-cart" size={20} />,
           label: 'My Orders',
-          route: '/MyAccount',
+          route: '/MyOrders',
         },
         {
           icon: <FontAwesome name="money" size={20} />,
