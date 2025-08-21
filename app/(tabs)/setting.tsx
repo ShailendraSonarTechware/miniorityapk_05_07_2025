@@ -19,12 +19,16 @@ import {
 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useAuth } from "../..//hooks/AuthContext";
+
+
 export default function AccountSettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const user = {
-    name: 'John Doe',
-    email: 'johndoe@gmail.com',
+  const { user, logout } = useAuth();
+  const user1 = {
+    // name: 'John Doe',
+    // email: 'johndoe@gmail.com',
     avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
     background:
       'https://i.ibb.co/WvCN074r/8adbb0c5a13e14b47fd390cac8d8921e819ca1ec.jpg',
@@ -130,7 +134,7 @@ export default function AccountSettingsScreen() {
         {/* Background */}
         <View style={styles.backgroundWrapper}>
           <ImageBackground
-            source={{ uri: user.background }}
+            source={{ uri: user1.background }}
             style={styles.bgImage}
           >
             <TouchableOpacity
@@ -145,7 +149,7 @@ export default function AccountSettingsScreen() {
         <View style={styles.avatarWrapper}>
           <View style={styles.profileOuter}>
             <View style={styles.profileInner}>
-              <Image source={{ uri: user.avatar }} style={styles.avatar} />
+              <Image source={{ uri: user1.avatar }} style={styles.avatar} />
             </View>
           </View>
         </View>
@@ -153,10 +157,10 @@ export default function AccountSettingsScreen() {
         {/* Black Bar */}
         <View style={styles.blackBar}>
           <View style={styles.info}>
-            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.name}>{user?.name || "Guest"}</Text>
             <View style={styles.emailRow}>
               <MaterialIcons name="edit" size={14} color="#f4a426" />
-              <Text style={styles.email}>{user.email}</Text>
+              <Text style={styles.email}>{user?.email || "guest@example.com"}</Text>
             </View>
           </View>
         </View>

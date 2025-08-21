@@ -11,6 +11,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../utils/api';
+import { useAuth } from "../../hooks/AuthContext";
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -18,41 +20,57 @@ export default function Login() {
   const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [loading, setLoading] = useState(false);  // Added loading state
   const [error, setError] = useState('');  // Added error state
+    const { login } = useAuth();
 
-  // Function to handle login
-  const handleLogin = useCallback(async () => {
-    if (!email || !password) {
-      setError('Please enter both email and password.');
-      return; // Prevent navigation if email or password is missing
-    }
+ // Function to handle login
+const handleLogin = useCallback(async () => {
+  if (!email || !password) {
+    setError("Please enter both email and password.");
+    return;
+  }
 
-    setLoading(true);
-    setError(''); // Reset error before making the API call
+  setLoading(true);
+  setError("");
 
-    try {
-      const res = await api.post('/users/login', { email, password });
-      if (res.status === 200) {
-        // Assuming successful login
-        await AsyncStorage.setItem('authToken', res.data.token);
-        
-        // Delay navigation slightly to ensure state is set
-        setTimeout(() => {
-          router.replace('/(tabs)');
-        }, 200);
-        console.log("Login successful!");
-      } else {
-        setError('Login failed. Please check your credentials.');
+  try {
+    const res = await api.post("/users/login", { email, password });
+
+    if (res.status === 200) {
+      // Save token
+      await AsyncStorage.setItem("authToken", res.data.token);
+
+      // Save user details
+      const token = res.data.token;
+      // const userData = {
+      //   name: res.data.user.name,
+      //   email: res.data.user.email,
+      // };
+      const userData = res.data.user;
+      // console.log("Saved userData:", userData);
+
+      // console.log("Backend user:", res.data.user);
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+      // Update global AuthContext
+      if (login) {
+        await login(userData,token);
       }
-    } catch (err) {
-      if (err instanceof Error) {
-        setError('Login failed. Please check your credentials.');
-      } else {
-        setError('An unexpected error occurred.');
-      }
-    } finally {
-      setLoading(false);
+
+      // Navigate after login
+      setTimeout(() => {
+        router.replace("/(tabs)");
+      }, 200);
+
+      console.log("Login successful!");
+    } else {
+      setError("Login failed. Please check your credentials.");
     }
-  }, [email, password]);
+  } catch (err) {
+    setError("Login failed. Please check your credentials.");
+  } finally {
+    setLoading(false);
+  }
+}, [email, password]);
 
   // Function to check authentication status
   const checkAuth = async () => {

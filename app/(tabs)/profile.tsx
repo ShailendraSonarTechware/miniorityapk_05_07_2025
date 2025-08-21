@@ -10,14 +10,22 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Settings, Share, Bell, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
+import { useAuth } from "../../hooks/AuthContext";
 
 export default function ProfileTab() {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/auth/Login");
+  };
+
   const menuItems = [
     { icon: Settings, label: 'Settings', action: () => {} },
     { icon: Share, label: 'Share App', action: () => {} },
     { icon: Bell, label: 'Notifications', action: () => {} },
     { icon: HelpCircle, label: 'Help & Support', action: () => {} },
-    { icon: LogOut, label: 'Sign Out', action: () => router.push('../../onboarding/Onboarding1'),destructive: true },
+    { icon: LogOut, label: 'Sign Out', action: handleLogout, destructive: true },
   ];
 
   return (
@@ -26,18 +34,26 @@ export default function ProfileTab() {
         <View style={styles.header}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' }}
+              source={{
+                uri:
+                //  user?.avatar || 
+                'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2'
+              }}
               style={styles.profileImage}
             />
           </View>
-          <Text style={styles.userName}>Alex Johnson</Text>
-          <Text style={styles.userEmail}>alex.johnson@example.com</Text>
+          <Text style={styles.userName}>
+            {user?.name || "Guest User"}
+          </Text>
+          <Text style={styles.userEmail}>
+            {user?.email || "No email available"}
+          </Text>
         </View>
 
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>234</Text>
-            <Text style={styles.statLabel}> Liked</Text>
+            <Text style={styles.statLabel}>Liked</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>18</Text>
@@ -74,7 +90,7 @@ export default function ProfileTab() {
         <View style={styles.appInfo}>
           <Text style={styles.appVersion}>Version 1.0.0</Text>
           <Text style={styles.appDescription}>
-            Discover and save 
+            Discover and save
           </Text>
         </View>
       </ScrollView>

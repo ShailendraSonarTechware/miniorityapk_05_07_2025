@@ -17,10 +17,14 @@ import {
 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useAuth } from "../..//hooks/AuthContext";
 const MyAccount = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const user = {
+  const { user, logout } = useAuth();
+  // console.log("Context user:", user);
+  // console.log(user?.name, user?.gender)
+  const user1 = {
     name: 'John Doe',
     dob: '12.04.1998',
     email: 'johndoe@gmail.com',
@@ -42,7 +46,7 @@ const MyAccount = () => {
         {/* Background */}
         <View style={styles.backgroundWrapper}>
           <ImageBackground
-            source={{ uri: user.background }}
+            source={{ uri: user1.background }}
             style={styles.bgImage}
           >
             <TouchableOpacity
@@ -58,7 +62,7 @@ const MyAccount = () => {
         <View style={styles.avatarWrapper}>
           <View style={styles.profileOuter}>
             <View style={styles.profileInner}>
-              <Image source={{ uri: user.avatar }} style={styles.avatar} />
+              <Image source={{ uri: user1.avatar }} style={styles.avatar} />
             </View>
           </View>
         </View>
@@ -67,35 +71,35 @@ const MyAccount = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>PERSONAL INFORMATION</Text>
           <View style={styles.row}>
-            <Label label="Name" value={user.name} />
+            <Label label="Name" value={user?.name || "Guest"} />
           </View>
           <View style={styles.row}>
-            <Label label="DOB" value={user.dob} />
+            <Label label="DOB" value={user1.dob} />
           </View>
           <View style={styles.row}>
-            <Label label="Email Address" value={user.email} grey />
+            <Label label="Email Address" value={user?.email || "guest@example.com"} grey />
           </View>
           <View style={styles.row}>
-            <Label label="Age" value={user.age.toString()} />
+            <Label label="Age" value={user1.age.toString()} />
           </View>
           <View style={styles.row}>
-            <Label label="Gender" value={user.gender} />
+            <Label label="Gender" value={user?.gender || "unknown"} />
           </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>ADDRESS</Text>
           <View style={styles.row}>
-            <Label label="Address" value={user.address} multiline />
+            <Label label="Address" value={user1.address} multiline />
           </View>
           <View style={styles.row}>
-            <Label label="Time Zone" value={user.timeZone} />
+            <Label label="Time Zone" value={user1.timeZone} />
           </View>
           <View style={styles.row}>
-            <Label label="Location" value={user.location} />
+            <Label label="Location" value={user1.location} />
           </View>
           <View style={styles.row}>
-            <Label label="Zip Code" value={user.zipCode} />
+            <Label label="Zip Code" value={user1.zipCode} />
           </View>
         </View>
 
