@@ -1,49 +1,57 @@
 // App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, ScrollView, View, Text, Image, TextInput, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Menu } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import { getCategories } from "../../services/serviceService"
 
-const categories = [
-  { id: '1', name: 'Furnitures', icon: 'https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/000000/external-furniture-interior-design-flatart-icons-outline-flatarticons.png' },
-  { id: '2', name: 'Fashion', icon: 'https://img.icons8.com/color/96/fashion.png' },
-  { id: '3', name: 'Health & ..', icon: 'https://img.icons8.com/ios-filled/50/makeup.png' },
-  { id: '4', name: 'Books', icon: 'https://img.icons8.com/ios-filled/50/book.png' },
-  { id: '5', name: 'Decor', icon: 'https://img.icons8.com/ios/50/ceiling-lamp.png' },
-  { id: '6', name: 'Kitchen', icon: 'https://img.icons8.com/ios-filled/50/kitchen-room.png' },
-];
+type Category = {
+  _id: string;
+  name: string;
+  slug: string;
+  img?: string;
+};
+
+// const categories = [
+//   { id: '1', name: 'Furnitures', icon: 'https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/000000/external-furniture-interior-design-flatart-icons-outline-flatarticons.png' },
+//   { id: '2', name: 'Fashion', icon: 'https://img.icons8.com/color/96/fashion.png' },
+//   { id: '3', name: 'Health & ..', icon: 'https://img.icons8.com/ios-filled/50/makeup.png' },
+//   { id: '4', name: 'Books', icon: 'https://img.icons8.com/ios-filled/50/book.png' },
+//   { id: '5', name: 'Decor', icon: 'https://img.icons8.com/ios/50/ceiling-lamp.png' },
+//   { id: '6', name: 'Kitchen', icon: 'https://img.icons8.com/ios-filled/50/kitchen-room.png' },
+// ];
 
 const serviceFilters = ['All', 'Home Care', 'Fashion', 'Skin & Beauty', 'Tour & Travel', 'Gardening', 'Construction'];
 
 const products = [
-  { id: '1', title: 'Feature Product Title', price: '$499.00',  image: { uri: 'https://i.ibb.co/yBd217BB/jacket.png' } },
-  { id: '2', title: 'Feature Product Title', price: '$499.00',  image: { uri: 'https://i.ibb.co/cKKPFVnk/sofa.png' } },
-  { id: '3', title: 'Feature Product Title', price: '$499.00',  image: { uri: 'https://i.ibb.co/MxBg9HBc/pot.png' }},
+  { id: '1', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/yBd217BB/jacket.png' } },
+  { id: '2', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/cKKPFVnk/sofa.png' } },
+  { id: '3', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/MxBg9HBc/pot.png' } },
 ];
 
 const restaurant = [
   { id: '1', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/TMMfVRCs/resone.jpg' } },
-  { id: '2', title: 'Feature Product Title', price: '$499.00', image:{ uri: 'https://i.ibb.co/SwCyRWTb/restwo.jpg '}},
-  { id: '3', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/hR7KyzsP/resthree.jpg' }},
-  { id: '4', title: 'Feature Product Title', price: '$499.00',  image: { uri: 'https://i.ibb.co/N8vGmbD/resfour.jpg' }},
+  { id: '2', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/SwCyRWTb/restwo.jpg ' } },
+  { id: '3', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/hR7KyzsP/resthree.jpg' } },
+  { id: '4', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/N8vGmbD/resfour.jpg' } },
 ];
 const food_products = [
-  { id: '1', title: 'Feature Product Title', price: '$499.00',  image: { uri: 'https://i.ibb.co/ycVgmbKm/coconut.png' } },
-  { id: '2', title: 'Feature Product Title', price: '$499.00',  image: { uri: 'https://i.ibb.co/j99mRp4W/orange.png' } },
-  { id: '3', title: 'Feature Product Title', price: '$499.00',  image: { uri: 'https://i.ibb.co/21J0jVGJ/beatroot.png' }},
+  { id: '1', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/ycVgmbKm/coconut.png' } },
+  { id: '2', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/j99mRp4W/orange.png' } },
+  { id: '3', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/21J0jVGJ/beatroot.png' } },
 ];
 
 const services = [
-  { id: '1', name: 'MAGNA TOURISM', tag: 'Solo Trip', category: 'TOUR & TRAVEL', image: { uri: 'https://i.ibb.co/FbS60sNR/magna.jpg' }},
-  { id: '2', name: 'ORCHID BEAUTY SPA', tag: 'Spa Care', category: 'SKIN & BEAUTY', image: { uri: 'https://i.ibb.co/xqjbFh4z/cleaner.jpg' }  },
-  { id: '2', name: 'ORCHID BEAUTY SPA', tag: 'Spa Care', category: 'SKIN & BEAUTY', image: { uri: 'https://i.ibb.co/X1qB42g/plantation.jpg' }  },
+  { id: '1', name: 'MAGNA TOURISM', tag: 'Solo Trip', category: 'TOUR & TRAVEL', image: { uri: 'https://i.ibb.co/FbS60sNR/magna.jpg' } },
+  { id: '2', name: 'ORCHID BEAUTY SPA', tag: 'Spa Care', category: 'SKIN & BEAUTY', image: { uri: 'https://i.ibb.co/xqjbFh4z/cleaner.jpg' } },
+  { id: '2', name: 'ORCHID BEAUTY SPA', tag: 'Spa Care', category: 'SKIN & BEAUTY', image: { uri: 'https://i.ibb.co/X1qB42g/plantation.jpg' } },
 ];
 
 const vendors = [
   { id: '1', logo: { uri: 'https://i.ibb.co/Y4YXyZ2B/raymond.png' } },
   { id: '2', logo: { uri: 'https://i.ibb.co/JRCHPSfs/puma.png' } },
-  { id: '3', logo: { uri: 'https://i.ibb.co/DHZZGnpH/pepe.png' }},
+  { id: '3', logo: { uri: 'https://i.ibb.co/DHZZGnpH/pepe.png' } },
   { id: '4', logo: { uri: 'https://i.ibb.co/hF4q5mZM/fila.png' } },
   { id: '5', logo: { uri: 'https://i.ibb.co/Q3Fj1PZb/reebok.png' } },
 ];
@@ -51,26 +59,42 @@ const vendors = [
 
 export default function App() {
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getCategories(); // from categoryService
+        setCategories(res.data); // ✅ use res.data.data if your service returns whole object
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, []);
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
         <View style={styles.container}>
-      <Image
-        source={{ uri: 'https://i.ibb.co/0ytxPkCH/onboardimage-removebg-preview.png' }}
-        style={styles.logo}
-      />
-      <TouchableOpacity onPress={() => console.log('Hamburger pressed')}>
-        <Menu size={28} color="#000" /> 
-      </TouchableOpacity>
-    </View>
+          <Image
+            source={{ uri: 'https://i.ibb.co/0ytxPkCH/onboardimage-removebg-preview.png' }}
+            style={styles.logo}
+          />
+          <TouchableOpacity onPress={() => console.log('Hamburger pressed')}>
+            <Menu size={28} color="#000" />
+          </TouchableOpacity>
+        </View>
 
 
         <TextInput style={styles.search} placeholder="Search Products, Services, etc." />
 
-        <Image source={{ uri: 'https://i.ibb.co/NgqqGZnr/Banner.png' }}  style={styles.banner} />
+        <Image source={{ uri: 'https://i.ibb.co/NgqqGZnr/Banner.png' }} style={styles.banner} />
 
-        <FlatList
+
+        {/* this is service category list  */}
+        {/* <FlatList
           horizontal
           data={categories}
           keyExtractor={item => item.id}
@@ -79,6 +103,21 @@ export default function App() {
           renderItem={({ item }) => (
             <View style={styles.categoryCard}>
               <Image source={{ uri: item.icon }} style={styles.categoryIcon} />
+              <Text style={styles.categoryText}>{item.name}</Text>
+            </View>
+          )}
+        /> */}
+        <FlatList
+          data={categories}
+          keyExtractor={(item) => item._id}  // ✅ every item has _id
+          horizontal
+          style={styles.categoryList}
+          renderItem={({ item }) => (
+            <View style={styles.categoryCard}>
+              <Image
+                source={{ uri: item.img || "https://via.placeholder.com/60" }} // ✅ fallback image
+                style={styles.categoryIcon}
+              />
               <Text style={styles.categoryText}>{item.name}</Text>
             </View>
           )}
@@ -95,7 +134,7 @@ export default function App() {
           data={products}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.card}
               onPress={() => router.push('/products/[productId]')}
             >
@@ -135,7 +174,7 @@ export default function App() {
 
         {services.map(service => (
           <View key={service.id} style={styles.cardHorizontal}>
-            <Image source={ service.image } style={styles.image} />
+            <Image source={service.image} style={styles.image} />
             <View>
               <Text style={{ fontWeight: 'bold' }}>{service.name}</Text>
               <Text>{service.category}</Text>
@@ -146,7 +185,7 @@ export default function App() {
 
         <Image source={{ uri: 'https://i.ibb.co/zVwK4P8Z/beauty-salon-banner.jpg' }} style={styles.banner} />
 
-        
+
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>FOOD PRODUCTS</Text>
@@ -167,19 +206,19 @@ export default function App() {
           )}
         />
 
-<Text style={styles.sectionTitle}>OUR VALUABLE VENDORS</Text>
-<FlatList
-  horizontal
-  data={vendors}
-  keyExtractor={item => item.id}
-  renderItem={({ item }) => (
-    <View style={styles.vendorCard}>
-      <Image source={item.logo} style={styles.vendorLogo} />
-    </View>
-  )}
-  contentContainerStyle={{ paddingHorizontal: 10 }}
-/>
-<Image source={{ uri: 'https://i.ibb.co/LX9XGMNj/middle-banner.png' }} style={styles.banner} />
+        <Text style={styles.sectionTitle}>OUR VALUABLE VENDORS</Text>
+        <FlatList
+          horizontal
+          data={vendors}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.vendorCard}>
+              <Image source={item.logo} style={styles.vendorLogo} />
+            </View>
+          )}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
+        />
+        <Image source={{ uri: 'https://i.ibb.co/LX9XGMNj/middle-banner.png' }} style={styles.banner} />
 
         <Text style={styles.sectionTitle}>ALL RESTAURANTS</Text>
         <FlatList
@@ -194,41 +233,41 @@ export default function App() {
             </View>
           )}
         />
-<Image source={{ uri: 'https://i.ibb.co/9mrbhCst/banner-food.jpg' }} style={styles.banner} />
+        <Image source={{ uri: 'https://i.ibb.co/9mrbhCst/banner-food.jpg' }} style={styles.banner} />
         <Text style={styles.sectionTitle}>READING LIST</Text>
 
-{[1, 2, 3].map(id => (
-  <View key={id} style={styles.blogCardLast}>
-    <Image
-      source={{ uri: 'https://i.ibb.co/v4v0PBNh/900849e5dc665c8f2363c0dc678c6962b77a5069.jpg' }} // Update with actual image URL
-      style={styles.blogImage}
-    />
-    <View style={styles.blogContent}>
-      <View style={styles.blogMeta}>
-        <Text style={styles.blogDate}>14TH APRIL, 2025</Text>
-        <Text style={styles.blogCategory}>  |  DESIGN</Text>
-      </View>
+        {[1, 2, 3].map(id => (
+          <View key={id} style={styles.blogCardLast}>
+            <Image
+              source={{ uri: 'https://i.ibb.co/v4v0PBNh/900849e5dc665c8f2363c0dc678c6962b77a5069.jpg' }} // Update with actual image URL
+              style={styles.blogImage}
+            />
+            <View style={styles.blogContent}>
+              <View style={styles.blogMeta}>
+                <Text style={styles.blogDate}>14TH APRIL, 2025</Text>
+                <Text style={styles.blogCategory}>  |  DESIGN</Text>
+              </View>
 
-      <Text style={styles.blogTitle}>
-        LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ELIT ...
-      </Text>
+              <Text style={styles.blogTitle}>
+                LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ELIT ...
+              </Text>
 
-      <View style={styles.blogFooter}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/40' }}
-          style={styles.authorImage}
-        />
-        <View style={styles.authorInfo}>
-          <Text style={styles.authorName}>JOHN DOE</Text>
-          <Text style={styles.blogDetails}>2 Days Ago • 5 Min Read</Text>
-        </View>
-        <TouchableOpacity>
-          <Text style={styles.bookmark}>🔖</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-))}
+              <View style={styles.blogFooter}>
+                <Image
+                  source={{ uri: 'https://via.placeholder.com/40' }}
+                  style={styles.authorImage}
+                />
+                <View style={styles.authorInfo}>
+                  <Text style={styles.authorName}>JOHN DOE</Text>
+                  <Text style={styles.blogDetails}>2 Days Ago • 5 Min Read</Text>
+                </View>
+                <TouchableOpacity>
+                  <Text style={styles.bookmark}>🔖</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        ))}
 
 
 
@@ -241,7 +280,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -365,71 +404,71 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
   },
-blogCardLast: {
-  flexDirection: 'row',
-  backgroundColor: '#fff', // white background
-  borderWidth: 1,
-  borderColor: '#ddd',
-  marginHorizontal: 10,
-  marginBottom: 15,
-  borderRadius: 6,
-  overflow: 'hidden',
-},
-blogImage: {
-  width: 140,
-  height: 130,
-  resizeMode: 'cover',
-},
-blogContent: {
-  flex: 1,
-  padding: 10,
-  justifyContent: 'space-between',
-},
-blogMeta: {
-  flexDirection: 'row',
-  marginBottom: 6,
-},
-blogDate: {
-  fontSize: 12,
-  color: '#333',
-},
-blogCategory: {
-  fontSize: 12,
-  color: '#333',
-  fontWeight: '500',
-  marginLeft: 4,
-},
-blogTitle: {
-  fontSize: 14,
-  fontWeight: 'bold',
-  color: '#111',
-  marginBottom: 8,
-},
-blogFooter: {
-  flexDirection: 'row',
-  alignItems: 'center',
-},
-authorImage: {
-  width: 30,
-  height: 30,
-  borderRadius: 15,
-  marginRight: 8,
-},
-authorName: {
-  fontSize: 12,
-  fontWeight: 'bold',
-  color: '#00ADEF',
-},
-blogDetails: {
-  fontSize: 11,
-  color: '#777',
-},
-bookmark: {
-  fontSize: 16,
-  color: '#FFA500',
-},
+  blogCardLast: {
+    flexDirection: 'row',
+    backgroundColor: '#fff', // white background
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginHorizontal: 10,
+    marginBottom: 15,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  blogImage: {
+    width: 140,
+    height: 130,
+    resizeMode: 'cover',
+  },
+  blogContent: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'space-between',
+  },
+  blogMeta: {
+    flexDirection: 'row',
+    marginBottom: 6,
+  },
+  blogDate: {
+    fontSize: 12,
+    color: '#333',
+  },
+  blogCategory: {
+    fontSize: 12,
+    color: '#333',
+    fontWeight: '500',
+    marginLeft: 4,
+  },
+  blogTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#111',
+    marginBottom: 8,
+  },
+  blogFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  authorImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 8,
+  },
+  authorName: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#00ADEF',
+  },
+  blogDetails: {
+    fontSize: 11,
+    color: '#777',
+  },
+  bookmark: {
+    fontSize: 16,
+    color: '#FFA500',
+  },
   authorInfo: {
     flex: 1,
   }
-  
+
 });

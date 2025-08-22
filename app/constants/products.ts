@@ -1,7 +1,7 @@
 export const products = [
   {
     id: '1',
-    title: 'Feature Product Title',
+    title: 'Feature Product Title somoosonar',
     price: '$499.00',
     image: { uri: 'https://i.ibb.co/yBd217BB/jacket.png' }
   },

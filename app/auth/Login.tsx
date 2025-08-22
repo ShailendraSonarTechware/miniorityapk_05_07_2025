@@ -33,7 +33,7 @@ const handleLogin = useCallback(async () => {
   setError("");
 
   try {
-    const res = await api.post("/users/login", { email, password });
+    const res = await api.post("/users/login", { email, password },{ withCredentials: true });
 
     if (res.status === 200) {
       // Save token
@@ -45,6 +45,7 @@ const handleLogin = useCallback(async () => {
       //   name: res.data.user.name,
       //   email: res.data.user.email,
       // };
+      console.log("Token from API:", res.data.token);
       const userData = res.data.user;
       // console.log("Saved userData:", userData);
 
@@ -54,6 +55,7 @@ const handleLogin = useCallback(async () => {
       // Update global AuthContext
       if (login) {
         await login(userData,token);
+        // await login(userData,token);
       }
 
       // Navigate after login
