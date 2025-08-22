@@ -5,6 +5,7 @@ import { Menu } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { getCategories } from "../../services/serviceService"
+import ProductPreview from '../components/ProductPreviewShort';
 
 type Category = {
   _id: string;
@@ -92,21 +93,8 @@ export default function App() {
 
         <Image source={{ uri: 'https://i.ibb.co/NgqqGZnr/Banner.png' }} style={styles.banner} />
 
-
+        {/* ------------------------------------- */}
         {/* this is service category list  */}
-        {/* <FlatList
-          horizontal
-          data={categories}
-          keyExtractor={item => item.id}
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoryList}
-          renderItem={({ item }) => (
-            <View style={styles.categoryCard}>
-              <Image source={{ uri: item.icon }} style={styles.categoryIcon} />
-              <Text style={styles.categoryText}>{item.name}</Text>
-            </View>
-          )}
-        /> */}
         <FlatList
           data={categories}
           keyExtractor={(item) => item._id}  // ✅ every item has _id
@@ -129,21 +117,16 @@ export default function App() {
             <Text style={styles.viewAllText}>View All</Text>
           </TouchableOpacity>
         </View>
-        <FlatList
-          horizontal
-          data={products}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => router.push('/products/[productId]')}
-            >
-              <Image source={item.image} style={styles.image} />
-              <Text>{item.title}</Text>
-              <Text>{item.price}</Text>
-            </TouchableOpacity>
-          )}
-        />
+        {/* ------------------------------------- */}
+
+
+
+        {/* ------------------------------------- */}
+        {/* small preview of product in home page  */}
+        <ProductPreview />
+        {/* ------------------------------------- */}
+
+
 
         <Text style={styles.sectionTitle}>BOOK YOUR SERVICE</Text>
         <FlatList
