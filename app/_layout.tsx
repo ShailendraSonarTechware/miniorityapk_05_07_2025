@@ -1,7 +1,9 @@
 // app/_layout.tsx
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+// import { StatusBar } from "expo-status-bar";
+import { StatusBar } from "react-native";
 import { View, ActivityIndicator } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../hooks/AuthContext";
 import React from "react";
 
@@ -20,13 +22,17 @@ function AuthGate() {
   if (!token) {
     return (
       <>
-        <StatusBar style="auto" />
+       <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar backgroundColor="#000" barStyle="light-content" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="auth/Login" />
           <Stack.Screen name="auth/Signup" />
           <Stack.Screen name="auth/SignupVendor" />
           <Stack.Screen name="auth/ForgotPassword" />
         </Stack>
+        </SafeAreaView>
+    </SafeAreaProvider>
       </>
     );
   }
@@ -34,7 +40,9 @@ function AuthGate() {
   // 🔑 With token → everything else
   return (
     <>
-      <StatusBar style="auto" />
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor="#000" barStyle="light-content" />
       <Stack screenOptions={{ headerShown: false }}>
         {/* Onboarding Screens */}
         <Stack.Screen name="onboarding/Onboarding1" />
@@ -46,6 +54,8 @@ function AuthGate() {
         <Stack.Screen name="products/index" />
         <Stack.Screen name="(tabs)" />
       </Stack>
+       </SafeAreaView>
+    </SafeAreaProvider>
     </>
   );
 }

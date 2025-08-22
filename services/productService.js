@@ -1,6 +1,7 @@
 // services/productService.js
 import api from "../utils/api"; // axios instance you already have
 
+
 export const getProducts = async (page = 1, limit = 10, filters = {}) => {
   try {
     const params = {
@@ -19,4 +20,10 @@ export const getProducts = async (page = 1, limit = 10, filters = {}) => {
     console.error("Error fetching products", err);
     throw err;
   }
+};
+
+
+export const getProductById = async (id) => {
+  const res = await api.get(`/product/${id}`);
+  return res.data.data; // based on your JSON shape
 };

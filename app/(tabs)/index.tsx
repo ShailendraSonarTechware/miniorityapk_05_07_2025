@@ -14,22 +14,10 @@ type Category = {
   img?: string;
 };
 
-// const categories = [
-//   { id: '1', name: 'Furnitures', icon: 'https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/000000/external-furniture-interior-design-flatart-icons-outline-flatarticons.png' },
-//   { id: '2', name: 'Fashion', icon: 'https://img.icons8.com/color/96/fashion.png' },
-//   { id: '3', name: 'Health & ..', icon: 'https://img.icons8.com/ios-filled/50/makeup.png' },
-//   { id: '4', name: 'Books', icon: 'https://img.icons8.com/ios-filled/50/book.png' },
-//   { id: '5', name: 'Decor', icon: 'https://img.icons8.com/ios/50/ceiling-lamp.png' },
-//   { id: '6', name: 'Kitchen', icon: 'https://img.icons8.com/ios-filled/50/kitchen-room.png' },
-// ];
 
 const serviceFilters = ['All', 'Home Care', 'Fashion', 'Skin & Beauty', 'Tour & Travel', 'Gardening', 'Construction'];
 
-const products = [
-  { id: '1', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/yBd217BB/jacket.png' } },
-  { id: '2', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/cKKPFVnk/sofa.png' } },
-  { id: '3', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/MxBg9HBc/pot.png' } },
-];
+
 
 const restaurant = [
   { id: '1', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/TMMfVRCs/resone.jpg' } },

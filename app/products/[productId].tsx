@@ -1,88 +1,159 @@
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
-  ScrollView,
+  ActivityIndicator,
   Image,
+  ScrollView,
   Pressable,
   StyleSheet,
-} from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { FontAwesome } from '@expo/vector-icons';
-import SearchHeader from '../components/SearchHeader';
+} from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import { getProductById } from "../../services/productService";
 
-const dummyProduct = {
-  title: 'MEN REGULAR FIT PRINTED SPREAD COLLAR CASUAL SHIRT',
-  price: '$289',
-  originalPrice: '$1,663',
-  discount: '82% OFF',
-  rating: 4.2,
-  ratingsCount: 160,
-  reviewsCount: 5,
-  colors: ['#7B3F00', '#00BCD4', '#FFC107'],
-  sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-   image: { uri: 'https://i.ibb.co/yBd217BB/jacket.png' },
-  details: {
-    'Pack of': '4 (Special Pack)',
-    'Style Code': 'MLYCRA_16_BEIGE',
-    Closure: 'BUTTON',
-    Fit: 'REGULAR',
-    Fabric: 'LYCRA BLEND',
-    Sleeve: 'HALF SLEEVE',
-    Pattern: 'PRINTED',
-    Reversible: 'NO',
-    Collar: 'SPREAD',
-    Color: 'BEIGE, PINK',
-    'Wash Care': 'GENTLE MACHINE WASH',
-    'Suitable For': 'WESTERN WEAR',
-  },
+type ProductSize = {
+  sizeId: string;
+  size: string;
+  sku: string;
+  stock: number;
+  price: number;
+  salePrice?: number | null;
+  discountEndDate?: string | null;
+};
+
+type ProductVariant = {
+  variantId: string;
+  color: string;
+  label: string;
+  allowBackorder: boolean;
+  images: string[];
+  averageRating: number;
+  totalReviews: number;
+  sizes: ProductSize[];
+};
+
+export type Product = {
+  _id: string;
+  title: string;
+  description: string;
+  brand: string;
+  categoryId: string;
+  subcategoryId: string;
+  businessId: string;
+  coverImage: string;
+  specifications: { key: string; value: string; _id: string }[];
+  isPublished: boolean;
+  variants: ProductVariant[];
 };
 
 export default function ProductDetailScreen() {
-  const { productId } = useLocalSearchParams();
+  const { productId } = useLocalSearchParams<{ productId?: string }>();
   const router = useRouter();
-  const [selectedSize, setSelectedSize] = useState('S');
-  const [selectedColor, setSelectedColor] = useState(dummyProduct.colors[0]);
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+    null
+  );
+  const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (!productId) return;
+
+    getProductById(productId)
+      .then((data: Product) => {
+        if (data) {
+          setProduct(data);
+          if (data.variants?.length > 0) {
+            setSelectedVariant(data.variants[0]);
+            if (data.variants[0].sizes?.length > 0) {
+              setSelectedSize(data.variants[0].sizes[0]);
+            }
+          }
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [productId]);
+
+  if (loading && !product) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!product) {
+    return (
+      <View style={styles.center}>
+        <Text>Product not found</Text>
+      </View>
+    );
+  }
+
+  const price = selectedSize?.price ?? 0;
+  const salePrice = selectedSize?.salePrice ?? price;
+  const discount =
+    price && salePrice && price > salePrice
+      ? Math.round(((price - salePrice) / price) * 100)
+      : 0;
 
   return (
     <ScrollView style={styles.container}>
-      {/* <Pressable onPress={() => router.back()} style={styles.backButton}>
-        <Text style={styles.backText}>←</Text>
-      </Pressable> */}
-      <SearchHeader/>
 
+      
+
+
+      {/* ✅ Product Image */}
       <Image
-        source={dummyProduct.image}
+        source={{ uri: selectedVariant?.images?.[0] ?? product.coverImage }}
         style={styles.image}
         resizeMode="contain"
       />
+      {/* ✅ Brand Name */}
+<Text style={styles.brand}>{product.brand}</Text>
 
-      <Text style={styles.title}>{dummyProduct.title}</Text>
+      {/* ✅ Title */}
+      <Text style={styles.title}>{product.title}</Text>
+
+      {/* ✅ Ratings */}
       <View style={styles.ratingRow}>
         <FontAwesome name="star" size={16} color="gold" />
         <Text style={styles.ratingText}>
-          {dummyProduct.rating} | {dummyProduct.ratingsCount} Ratings &{' '}
-          {dummyProduct.reviewsCount} Reviews
+          {selectedVariant?.averageRating ?? 0} |{" "}
+          {selectedVariant?.totalReviews ?? 0} Reviews
         </Text>
       </View>
 
+      {/* ✅ Price */}
       <View style={styles.priceRow}>
-        <Text style={styles.price}>{dummyProduct.price}</Text>
-        <Text style={styles.originalPrice}>{dummyProduct.originalPrice}</Text>
-        <Text style={styles.discount}>{dummyProduct.discount}</Text>
+        <Text style={styles.salePrice}>${salePrice}</Text>
+        {discount > 0 && (
+          <>
+            <Text style={styles.originalPrice}>${price}</Text>
+            <Text style={styles.discount}>{discount}% OFF</Text>
+          </>
+        )}
       </View>
 
-      <Text style={styles.label}>Color:</Text>
+      {/* ✅ Colors */}
+      <Text style={styles.label}>Colors:</Text>
       <View style={styles.colorRow}>
-        {dummyProduct.colors.map((color, index) => (
+        {product.variants.map((variant) => (
           <Pressable
-            key={index}
-            onPress={() => setSelectedColor(color)}
+            key={variant.variantId}
+            onPress={() => {
+              setSelectedVariant(variant);
+              if (variant.sizes?.length > 0) {
+                setSelectedSize(variant.sizes[0]);
+              }
+            }}
             style={[
               styles.colorBox,
-              { backgroundColor: color },
-              selectedColor === color
+              { backgroundColor: variant.color },
+              selectedVariant?.variantId === variant.variantId
                 ? styles.colorSelected
                 : styles.colorUnselected,
             ]}
@@ -90,14 +161,15 @@ export default function ProductDetailScreen() {
         ))}
       </View>
 
-      <Text style={styles.label}>Size Chart:</Text>
+      {/* ✅ Sizes */}
+      <Text style={styles.label}>Sizes:</Text>
       <View style={styles.sizeRow}>
-        {dummyProduct.sizes.map((size) => (
+        {selectedVariant?.sizes?.map((size) => (
           <Pressable
-            key={size}
+            key={size.sizeId}
             style={[
               styles.sizeBox,
-              selectedSize === size
+              selectedSize?.sizeId === size.sizeId
                 ? styles.sizeSelected
                 : styles.sizeUnselected,
             ]}
@@ -105,17 +177,18 @@ export default function ProductDetailScreen() {
           >
             <Text
               style={
-                selectedSize === size
+                selectedSize?.sizeId === size.sizeId
                   ? styles.sizeTextSelected
                   : styles.sizeText
               }
             >
-              {size}
+              {size.size}
             </Text>
           </Pressable>
         ))}
       </View>
 
+      {/* ✅ Quantity + Cart/Buy */}
       <Text style={styles.label}>Quantity:</Text>
       <View style={styles.quantityRow}>
         <Pressable
@@ -131,7 +204,10 @@ export default function ProductDetailScreen() {
         >
           <Text>+</Text>
         </Pressable>
-        <Pressable style={styles.cartButton} onPress={() => router.push('../../(tabs)/cart')}>
+        <Pressable
+          style={styles.cartButton}
+          onPress={() => router.push("../../(tabs)/cart")}
+        >
           <Text>Add To Cart</Text>
         </Pressable>
         <Pressable style={styles.buyButton}>
@@ -139,41 +215,42 @@ export default function ProductDetailScreen() {
         </Pressable>
       </View>
 
+      {/* ✅ Specifications */}
       <Text style={styles.sectionTitle}>Product Details</Text>
       <View style={styles.detailsContainer}>
-        {Object.entries(dummyProduct.details).map(([key, val]) => (
-          <View key={key} style={styles.detailRow}>
-            <Text style={styles.detailKey}>{key}:</Text>
-            <Text>{val}</Text>
+        {product.specifications.map((spec) => (
+          <View key={spec._id} style={styles.detailRow}>
+            <Text style={styles.detailKey}>{spec.key}:</Text>
+            <Text>{spec.value}</Text>
           </View>
         ))}
       </View>
 
+      {/* ✅ Description */}
       <Text style={styles.sectionTitle}>Description</Text>
-      <Text style={styles.description}>
-        Add a stylish, laidback vibe to your wardrobe with this shirt. This
-        breezy button-up brings the cool with its relaxed collar and breathable
-        fabric. Wear it for casual days or layer it for a weekend vibe.
-      </Text>
+      <Text style={styles.description}>{product.description}</Text>
 
+      {/* ✅ Reviews */}
       <Text style={styles.sectionTitle}>Ratings & Reviews</Text>
       <Text>
-        ⭐️⭐️⭐️⭐️☆ — "Good product, fits well and the quality is nice."
+        ⭐️⭐️⭐️⭐️☆ — "This is where user reviews would appear..."
       </Text>
-
       <Pressable style={styles.reviewButton}>
         <Text style={styles.reviewButtonText}>WRITE A REVIEW</Text>
       </Pressable>
 
+      {/* ✅ Similar Products */}
       <Text style={styles.sectionTitle}>Similar Products</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.similarRow}
-      >
-        <Image source={dummyProduct.image} style={styles.similarImage} />
-        <Image source={dummyProduct.image} style={styles.similarImage} />
-        <Image source={dummyProduct.image} style={styles.similarImage} />
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.similarRow}>
+        {product.variants.flatMap((v, i) =>
+          v.images.map((img, idx) => (
+            <Image
+              key={`${i}-${idx}`}
+              source={{ uri: img }}
+              style={styles.similarImage}
+            />
+          ))
+        )}
       </ScrollView>
     </ScrollView>
   );
@@ -181,74 +258,63 @@ export default function ProductDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 16 },
-  backButton: { marginBottom: 12 },
-  backText: { fontSize: 16, color: '#000' },
-  image: { width: '100%', height: 300, borderRadius: 8 },
-  title: { fontSize: 18, fontWeight: 'bold', marginTop: 12 },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  image: { width: "100%", height: 300, borderRadius: 8 },
+  title: { fontSize: 18, fontWeight: "bold", marginTop: 12 },
+  ratingRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
   ratingText: { marginLeft: 4 },
-  priceRow: { flexDirection: 'row', marginTop: 8 },
-  price: { fontSize: 20, fontWeight: 'bold', color: '#000' },
+  priceRow: { flexDirection: "row", marginTop: 8 },
+  salePrice: { fontSize: 20, fontWeight: "bold", color: "#000" },
   originalPrice: {
     marginLeft: 10,
-    textDecorationLine: 'line-through',
-    color: 'gray',
+    textDecorationLine: "line-through",
+    color: "gray",
+    fontSize: 16,
   },
-  discount: { marginLeft: 10, color: 'green' },
-  label: { marginTop: 16, fontWeight: 'bold' },
-  colorRow: { flexDirection: 'row', marginTop: 8, gap: 12 },
+  discount: { marginLeft: 10, color: "green", fontWeight: "bold" },
+  label: { marginTop: 16, fontWeight: "bold" },
+  colorRow: { flexDirection: "row", marginTop: 8, gap: 12 },
   colorBox: { width: 30, height: 30, borderRadius: 15 },
-  colorSelected: { borderWidth: 2, borderColor: 'black' },
-  colorUnselected: { borderWidth: 1, borderColor: 'grey' },
-  sizeRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  colorSelected: { borderWidth: 2, borderColor: "black" },
+  colorUnselected: { borderWidth: 1, borderColor: "grey" },
+  sizeRow: { flexDirection: "row", gap: 8, marginTop: 8 },
   sizeBox: { padding: 10 },
-  sizeSelected: {
-    backgroundColor: '#000',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  sizeUnselected: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  sizeText: { color: '#000' },
-  sizeTextSelected: { color: '#fff' },
-  quantityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 8,
-  },
+  sizeSelected: { backgroundColor: "#000", borderWidth: 1, borderColor: "#000" },
+  sizeUnselected: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#ccc" },
+  sizeText: { color: "#000" },
+  sizeTextSelected: { color: "#fff" },
+  quantityRow: { flexDirection: "row", alignItems: "center", marginVertical: 8 },
   quantityButton: { padding: 10, borderWidth: 1 },
   quantityText: { marginHorizontal: 16 },
   cartButton: {
     flex: 1,
-    backgroundColor: '#f1c40f',
+    backgroundColor: "#f1c40f",
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginLeft: 12,
   },
   buyButton: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     padding: 12,
     marginLeft: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  buyButtonText: { color: '#fff' },
-  sectionTitle: { marginTop: 24, fontWeight: 'bold', fontSize: 16 },
+  buyButtonText: { color: "#fff" },
+  sectionTitle: { marginTop: 24, fontWeight: "bold", fontSize: 16 },
   detailsContainer: { marginTop: 8 },
-  detailRow: { flexDirection: 'row', marginBottom: 4 },
-  detailKey: { fontWeight: 'bold', width: 150 },
+  detailRow: { flexDirection: "row", marginBottom: 4 },
+  detailKey: { fontWeight: "bold", width: 150 },
   description: { marginTop: 8 },
   reviewButton: {
     marginTop: 16,
-    borderColor: 'red',
+    borderColor: "red",
     borderWidth: 1,
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  reviewButtonText: { color: 'red', fontWeight: 'bold' },
+  reviewButtonText: { color: "red", fontWeight: "bold" },
   similarRow: { marginTop: 8 },
   similarImage: { width: 120, height: 140, marginRight: 8 },
+  brand: { fontSize: 14, fontWeight: "600", color: "gray", marginTop: 8 },
 });
