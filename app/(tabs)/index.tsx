@@ -82,7 +82,7 @@ export default function App() {
             source={{ uri: 'https://i.ibb.co/0ytxPkCH/onboardimage-removebg-preview.png' }}
             style={styles.logo}
           />
-          <TouchableOpacity onPress={() => console.log('Hamburger pressed')}>
+          <TouchableOpacity onPress={() => console.log('Hamburger pressed')} style={{ paddingRight: 10 }}>
             <Menu size={28} color="#000" />
           </TouchableOpacity>
         </View>
