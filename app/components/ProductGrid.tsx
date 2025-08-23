@@ -116,7 +116,8 @@ const ProductGrid = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    // <SafeAreaView style={styles.container}>
+    <>
       <SearchBar />
       <FilterBar />
       <FlatList
@@ -128,7 +129,8 @@ const ProductGrid = () => {
         contentContainerStyle={{ paddingBottom: 100, minHeight: height }}
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+      </>
+    // </SafeAreaView>
   );
 };
 

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { getCategories } from "../../services/serviceService"
 import ProductPreview from '../components/ProductPreviewShort';
+import ServicePreview from '../components/ServicePreviewShort';
 
 type Category = {
   _id: string;
@@ -29,12 +30,6 @@ const food_products = [
   { id: '1', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/ycVgmbKm/coconut.png' } },
   { id: '2', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/j99mRp4W/orange.png' } },
   { id: '3', title: 'Feature Product Title', price: '$499.00', image: { uri: 'https://i.ibb.co/21J0jVGJ/beatroot.png' } },
-];
-
-const services = [
-  { id: '1', name: 'MAGNA TOURISM', tag: 'Solo Trip', category: 'TOUR & TRAVEL', image: { uri: 'https://i.ibb.co/FbS60sNR/magna.jpg' } },
-  { id: '2', name: 'ORCHID BEAUTY SPA', tag: 'Spa Care', category: 'SKIN & BEAUTY', image: { uri: 'https://i.ibb.co/xqjbFh4z/cleaner.jpg' } },
-  { id: '2', name: 'ORCHID BEAUTY SPA', tag: 'Spa Care', category: 'SKIN & BEAUTY', image: { uri: 'https://i.ibb.co/X1qB42g/plantation.jpg' } },
 ];
 
 const vendors = [
@@ -116,7 +111,13 @@ export default function App() {
 
 
 
-        <Text style={styles.sectionTitle}>BOOK YOUR SERVICE</Text>
+       
+         <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>BOOK YOUR SERVICE</Text>
+          <TouchableOpacity onPress={() => router.push('../../components/ServiceCategory')}>
+            <Text style={styles.viewAllText}>View All</Text>
+          </TouchableOpacity>
+        </View>
         <FlatList
           horizontal
           data={serviceFilters}
@@ -143,16 +144,13 @@ export default function App() {
           )}
         />
 
-        {services.map(service => (
-          <View key={service.id} style={styles.cardHorizontal}>
-            <Image source={service.image} style={styles.image} />
-            <View>
-              <Text style={{ fontWeight: 'bold' }}>{service.name}</Text>
-              <Text>{service.category}</Text>
-              <Text>{service.tag}</Text>
-            </View>
-          </View>
-        ))}
+
+
+        {/* ------------------------------------- */}
+        {/* Small preview of Services in home page limit 3 */}
+        <ServicePreview/>
+        {/* ------------------------------------- */}
+
 
         <Image source={{ uri: 'https://i.ibb.co/zVwK4P8Z/beauty-salon-banner.jpg' }} style={styles.banner} />
 
@@ -310,10 +308,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   viewAllText: {
-    fontSize: 14,
-    color: '#E07B39',
+    fontSize: 12,
+    color: '#fff',
     fontWeight: '600',
-    marginRight: 10,
+    // marginRight: 2,
+    marginTop: 15,  
+    backgroundColor:'#16a1c0',
+    paddingHorizontal:10,
+    paddingVertical:5,
+    borderRadius:20
   },
   filterButton: {
     backgroundColor: '#eee',
