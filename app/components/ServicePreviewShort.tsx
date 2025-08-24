@@ -24,6 +24,7 @@ export default function ServicePreview() {
             reviews: item.totalReviews || 0,
             location: item.contact?.address || "Not Available",
             distance: "0.8km", // mock for now
+            slug: item.slug
           }));
           setServices(mapped);
         }
@@ -38,19 +39,20 @@ export default function ServicePreview() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Featured Services</Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#FF8C00" />
-      ) : (
-        services.map((s) => (
-          <ServiceCard
-            key={s.id}
-            service={s}
-            onPress={() => router.push("./ServiceDetail")}
-          />
-        ))
-      )}
-    </View>
+  <Text style={styles.heading}>Featured Services</Text>
+  {loading ? (
+    <ActivityIndicator size="large" color="#FF8C00" />
+  ) : (
+    services.map((s) => (
+      
+      <ServiceCard
+        key={s._id} // use _id from API instead of id
+        service={s}
+        onPress={() => router.push(`/service/${s.slug}` as any)}
+      />
+    ))
+  )}
+</View>
   );
 }
 

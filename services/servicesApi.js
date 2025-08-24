@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //   return res.data.data;
 // };
 
-export const getServiceById = async (slug: string) => {
+export const getServiceById = async (slug) => {
   const token = await AsyncStorage.getItem("authToken");
   const res = await api.get(`/services/${slug}`, {
     headers: {
