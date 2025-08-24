@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { ChevronLeft, Search, Heart, Star, MapPin } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { router, Href } from 'expo-router';
 import { getServices } from "../../services/serviceApi"; // ✅ use API service
 
 export default function HomeScreen() {
@@ -41,6 +41,7 @@ export default function HomeScreen() {
             reviews: item.totalReviews || 0,
             location: item.contact?.address || "Not Available",
             badge: "Book Now",
+            slug: item.slug
           }));
           setServices(mappedServices);
         }
@@ -58,6 +59,8 @@ export default function HomeScreen() {
   const filteredServices = services.filter((s) =>
     s.name.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  console.log("Filtered Services:", filteredServices);
 
   const renderServiceCard = (service: any) => (
     <View key={service.id} style={styles.serviceCard}>
@@ -167,14 +170,18 @@ export default function HomeScreen() {
               No services found
             </Text>
           ) : (
-            filteredServices.map((service, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => router.push('./ServiceDetail')}
-              >
-                {renderServiceCard(service)}
-              </TouchableOpacity>
-            ))
+            filteredServices.map((service, index) => {
+              console.log("Service slug:", service.slug); // ✅ check if defined
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => router.push(`/service/${service.slug}` as any)}
+                >
+                  {renderServiceCard(service)}
+                </TouchableOpacity>
+              );
+            })
+
           )}
         </View>
       </ScrollView>
