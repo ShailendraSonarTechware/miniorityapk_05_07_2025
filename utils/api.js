@@ -1,7 +1,9 @@
 
 import axios from 'axios';
 
-const API_URL ="http://192.168.0.104:3001/api";
+const API_URL ="https://api.minorityownedbusiness.info/api"; 
+// const API_URL ="http://192.168.0.104:3001/api";  //wifi
+// const API_URL ="http://172.20.79.196:3001/api";     //mobile data
   // process.env.EXPO_PUBLIC_API_URL || "http://localhost:3001/api";
 
 const api = axios.create({

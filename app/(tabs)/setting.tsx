@@ -19,7 +19,7 @@ import {
 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useAuth } from "../..//hooks/AuthContext";
+import { useAuth } from "../../hooks/AuthContext";
 
 
 export default function AccountSettingsScreen() {
