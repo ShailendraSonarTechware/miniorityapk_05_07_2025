@@ -126,7 +126,12 @@ export default function ServiceDetail({ slug }: ServiceDetailProps) {
           <TouchableOpacity style={styles.bookButton} onPress={() => setBookingVisible(true)}>
             <Text style={styles.bookButtonText}>Book Now</Text>
           </TouchableOpacity>
-          <BookingModal visible={isBookingVisible} onClose={() => setBookingVisible(false)} />
+          <BookingModal 
+  visible={isBookingVisible} 
+  onClose={() => setBookingVisible(false)} 
+  serviceId={service._id}                // ✅ dynamic service ID
+  services={service.services || []}      // ✅ pass services list
+/>
         </View>
 
         {/* Service Info */}

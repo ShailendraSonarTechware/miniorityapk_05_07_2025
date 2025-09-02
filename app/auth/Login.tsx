@@ -33,7 +33,8 @@ const handleLogin = useCallback(async () => {
   setError("");
 
   try {
-    const res = await api.post("/users/login", { email, password },{ withCredentials: true });
+    let role = "customer";
+    const res = await api.post("/users/login", { email, password, role },{ withCredentials: true });
 
     if (res.status === 200) {
       // Save token
