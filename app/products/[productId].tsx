@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { getProductById } from "../../services/productService";
+import { addItemToCart } from "../../services/cartApi";
 
 type ProductSize = {
   sizeId: string;
@@ -103,7 +104,7 @@ export default function ProductDetailScreen() {
   return (
     <ScrollView style={styles.container}>
 
-      
+
 
 
       {/* ✅ Product Image */}
@@ -113,7 +114,7 @@ export default function ProductDetailScreen() {
         resizeMode="contain"
       />
       {/* ✅ Brand Name */}
-<Text style={styles.brand}>{product.brand}</Text>
+      <Text style={styles.brand}>{product.brand}</Text>
 
       {/* ✅ Title */}
       <Text style={styles.title}>{product.title}</Text>
@@ -206,7 +207,33 @@ export default function ProductDetailScreen() {
         </Pressable>
         <Pressable
           style={styles.cartButton}
-          onPress={() => router.push("../../(tabs)/cart")}
+          onPress={async () => {
+            if (!selectedVariant || !selectedSize) {
+              alert("Please select color and size before adding to cart");
+              return;
+            }
+            console.log("Sending cart payload:", {
+              productId: product._id,
+              variantId: selectedVariant?.variantId,
+              quantity,
+              variant: selectedSize?.size,
+            });
+
+            try {
+              await addItemToCart({
+                productId: product._id,
+                variantId: selectedVariant?.variantId,  // use variantId from API
+                quantity,
+                variant: selectedSize?.size,            // backend expects string size
+              });
+
+              alert("✅ Added to cart!");
+              router.push("../../(tabs)/cart"); // navigate after success
+            } catch (err: any) {
+              console.error(err);
+              alert(err.response?.data?.message || "Failed to add to cart");
+            }
+          }}
         >
           <Text>Add To Cart</Text>
         </Pressable>

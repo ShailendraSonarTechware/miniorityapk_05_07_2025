@@ -8,11 +8,18 @@ import {
   TextInput,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import SearchHeader from "../components/SearchHeader";
-import { getCart } from "../../services/cartApi"; // still JS
-// ✅ Define cart types locally since only this file is TS
+import {
+  getCart,
+  updateCartItemByComposite,
+  removeCartItemByComposite,
+  addItemToCart, // ✅ make sure you have this in cartApi
+} from "../../services/cartApi";
+import { createBooking } from "../../services/createBooking";
 
+// Cart item type
 interface CartItem {
   title: string;
   productId: string;
@@ -32,6 +39,7 @@ interface CartItem {
   allowBackorder: boolean;
 }
 
+// Cart type
 interface Cart {
   _id: string;
   userId: string;
@@ -49,50 +57,84 @@ export default function Cart() {
   const [loading, setLoading] = useState<boolean>(true);
 
   // 🔹 Fetch cart
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        // const token = "your-auth-token"; // replace with secure storage
-        const data: Cart = await getCart();
-        setCart(data);
-      } catch (err) {
-        console.error("Error fetching cart:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchCart = async () => {
+    try {
+      const data: Cart = await getCart();
+      setCart(data);
+    } catch (err) {
+      console.error("Error fetching cart:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchCart();
   }, []);
 
-  const increment = (productId: string) => {
-    setCart((prev) =>
-      prev
-        ? {
-          ...prev,
-          items: prev.items.map((item) =>
-            item.productId === productId
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          ),
-        }
-        : prev
-    );
+  const refreshCart = async () => {
+    try {
+      const freshCart = await getCart();
+      setCart(freshCart);
+    } catch (err) {
+      console.error("Error refreshing cart:", err);
+    }
   };
 
-  const decrement = (productId: string) => {
-    setCart((prev) =>
-      prev
-        ? {
-          ...prev,
-          items: prev.items.map((item) =>
-            item.productId === productId && item.quantity > 1
-              ? { ...item, quantity: item.quantity - 1 }
-              : item
-          ),
-        }
-        : prev
-    );
+  const increment = async (item: CartItem) => {
+    try {
+      await updateCartItemByComposite({
+        productId: item.productId,
+        variantId: item.variantId,
+        size: item.size,
+        businessId: item.businessId,
+        quantity: item.quantity + 1,
+      });
+      await refreshCart();
+    } catch (err) {
+      console.error("Error incrementing:", err);
+    }
+  };
+
+  const decrement = async (item: CartItem) => {
+    if (item.quantity <= 1) return;
+    try {
+      await updateCartItemByComposite({
+        productId: item.productId,
+        variantId: item.variantId,
+        size: item.size,
+        businessId: item.businessId,
+        quantity: item.quantity - 1,
+      });
+      await refreshCart();
+    } catch (err) {
+      console.error("Error decrementing:", err);
+    }
+  };
+
+  const handleRemove = async (item: CartItem) => {
+    try {
+      await removeCartItemByComposite({
+        productId: item.productId,
+        variantId: item.variantId,
+        size: item.size,
+        businessId: item.businessId,
+      });
+      await refreshCart();
+    } catch (err) {
+      console.error("Error removing item:", err);
+    }
+  };
+
+  // 🔹 Checkout
+  const handleCheckout = async () => {
+    if (!cart) return;
+    try {
+      const res = await createBooking({ cartId: cart._id });
+      console.log("✅ Order placed:", res);
+    } catch (err) {
+      console.error("Checkout error:", err);
+    }
   };
 
   if (loading) {
@@ -113,6 +155,7 @@ export default function Cart() {
     );
   }
 
+  // 🔹 Pricing
   const totalMRP = cart.items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -128,11 +171,13 @@ export default function Cart() {
   return (
     <ScrollView style={styles.container}>
       <SearchHeader />
-
       <Text style={styles.header}>MY CART</Text>
 
       {cart.items.map((item) => (
-        <View key={item.productId} style={styles.cartItem}>
+        <View
+          key={`${item.productId}-${item.variantId}-${item.size}`} // ✅ stable key
+          style={styles.cartItem}
+        >
           <Image
             source={{ uri: item.imageUrl }}
             style={styles.productImage}
@@ -144,19 +189,22 @@ export default function Cart() {
             <Text style={styles.itemText}>SIZE: {item.size}</Text>
             <View style={styles.quantityContainer}>
               <Pressable
-                onPress={() => decrement(item.productId)}
+                onPress={() => decrement(item)}
                 style={styles.qtyButton}
               >
                 <Text style={styles.qtyText}>-</Text>
               </Pressable>
               <Text style={styles.qtyValue}>{item.quantity}</Text>
               <Pressable
-                onPress={() => increment(item.productId)}
+                onPress={() => increment(item)}
                 style={styles.qtyButton}
               >
                 <Text style={styles.qtyText}>+</Text>
               </Pressable>
             </View>
+            <Pressable onPress={() => handleRemove(item)}>
+              <Text style={{ color: "red", marginTop: 6 }}>Remove</Text>
+            </Pressable>
           </View>
           <Text style={styles.price}>${item.salePrice || item.price}</Text>
         </View>
@@ -164,7 +212,6 @@ export default function Cart() {
 
       {/* Pricing Section */}
       <Text style={styles.sectionTitle}>PRICING DETAILS</Text>
-
       <View style={styles.priceDetails}>
         <View style={styles.priceRow}>
           <Text style={styles.priceLabel}>Total MRP</Text>
@@ -188,7 +235,6 @@ export default function Cart() {
         Total Order: ${totalOrder.toFixed(2)}
       </Text>
 
-      {/* Best Coupons Section */}
       <View style={styles.couponsSection}>
         <View style={styles.couponsRow}>
           <Text style={styles.couponsTitle}>Best Coupons for You</Text>
@@ -198,48 +244,16 @@ export default function Cart() {
 
       <View style={styles.couponSection}>
         <Text style={styles.couponLabel}>ENTER COUPON CODE:</Text>
-        <TextInput style={styles.couponInput} placeholder="Enter coupon code..." placeholderTextColor="#999" />
+        <TextInput
+          style={styles.couponInput}
+          placeholder="Enter coupon code..."
+          placeholderTextColor="#999"
+        />
       </View>
 
-      <Pressable style={styles.checkoutButton}>
+      <Pressable style={styles.checkoutButton} onPress={handleCheckout}>
         <Text style={styles.checkoutText}>Proceed To Checkout</Text>
       </Pressable>
-      {/* Terms and Conditions and Privacy Policy */}
-      <View style={styles.termsSection}>
-        <Text style={styles.termsText}>By proceeding with this order, you agree to our
-          <Text style={styles.termsLink}> Terms & Conditions</Text> and
-          <Text style={styles.termsLink}> Privacy Policy</Text>.
-        </Text>
-      </View>
-      {/* Footer Image Section */}
-      <View style={styles.footerContainer}>
-        <View style={styles.footerItem}>
-          <Image
-            source={{ uri: 'https://i.ibb.co/6J80kz5y/7fadd64536b28293db70d663aa9afd29e5db7826.png' }} // Replace with actual logo path
-            style={styles.footerLogo}
-          />
-          <Text style={styles.footerText}>Genuine Product</Text>
-        </View>
-        <View style={styles.footerItem}>
-          <Image
-            source={{ uri: 'https://i.ibb.co/fz5NQfW3/cb83b470a4a674d4310ad441f74a92e3b763477f.png' }} // Replace with actual logo path
-            style={styles.footerLogo}
-          />
-          <Text style={styles.footerText}>Support Minority Businesses</Text>
-        </View>
-        <View style={styles.footerItem}>
-          <Image
-            source={{ uri: 'https://i.ibb.co/60SB2RwH/05ca92f1b294061fa0bcec1fb6b85bca6bcef732.png' }} // Replace with actual logo path
-            style={styles.footerLogo}
-          />
-          <Text style={styles.footerText}>Secure Payment</Text>
-        </View>
-      </View>
-
-      {/* <Pressable style={styles.checkoutButton}>
-        <Text style={styles.checkoutText}>Proceed To Checkout</Text>
-      </Pressable> */}
-
     </ScrollView>
   );
 }
@@ -283,22 +297,22 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   couponSection: { marginBottom: 16 },
-  couponLabel: { fontWeight: '600', marginBottom: 8 },
-  couponInput: { borderWidth: 1, borderColor: '#ccc', borderRadius: 4, padding: 8, fontSize: 14 },
-  // checkoutButton: { backgroundColor: '#FFC107', paddingVertical: 14, borderRadius: 6 },
+  couponLabel: { fontWeight: "600", marginBottom: 8 },
+  couponInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    padding: 8,
+    fontSize: 14,
+  },
   checkoutText: { textAlign: "center", fontSize: 16, fontWeight: "bold" },
-  // Coupons Section Styles
   couponsSection: { marginTop: 16, marginBottom: 16 },
-  couponsRow: { flexDirection: 'row', justifyContent: 'space-between' }, // Row layout for left and right alignment
-  couponsTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 8 },
-  viewCouponsText: { fontSize: 14, fontWeight: 'bold', color: '#007bff', textAlign: 'right' }, // Right aligned text
-  // Footer section styles
-  footerContainer: { flexDirection: 'row', justifyContent: 'space-around', paddingTop: 16, paddingBottom: 32, backgroundColor: '#fff6e0', marginTop: 20 },
-  footerItem: { alignItems: 'center' },
-  footerLogo: { width: 50, height: 50, marginBottom: 8 },
-  footerText: { fontSize: 12, color: '#555' },
-  // Terms and Conditions
-  termsSection: { marginTop: 16, alignItems: 'center' },
-  termsText: { fontSize: 14, color: '#555' },
-  termsLink: { color: '#ce5f44' }, // Red color for both terms and privacy policy links
+  couponsRow: { flexDirection: "row", justifyContent: "space-between" },
+  couponsTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 8 },
+  viewCouponsText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#007bff",
+    textAlign: "right",
+  },
 });
