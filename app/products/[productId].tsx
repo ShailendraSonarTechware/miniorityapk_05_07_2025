@@ -12,6 +12,7 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { getProductById } from "../../services/productService";
 import { addItemToCart } from "../../services/cartApi";
+import { useCart } from "../../contexts/CartContext";
 
 type ProductSize = {
   sizeId: string;
@@ -49,6 +50,7 @@ export type Product = {
 };
 
 export default function ProductDetailScreen() {
+    const { addToCart } = useCart();
   const { productId } = useLocalSearchParams<{ productId?: string }>();
   const router = useRouter();
 
@@ -59,6 +61,7 @@ export default function ProductDetailScreen() {
   );
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [quantity, setQuantity] = useState(1);
+
 
   useEffect(() => {
     if (!productId) return;
@@ -220,7 +223,7 @@ export default function ProductDetailScreen() {
             });
 
             try {
-              await addItemToCart({
+              await addToCart({
                 productId: product._id,
                 variantId: selectedVariant?.variantId,  // use variantId from API
                 quantity,
@@ -228,7 +231,7 @@ export default function ProductDetailScreen() {
               });
 
               alert("✅ Added to cart!");
-              router.push("../../(tabs)/cart"); // navigate after success
+              // router.push("../../(tabs)/cart"); // navigate after success
             } catch (err: any) {
               console.error(err);
               alert(err.response?.data?.message || "Failed to add to cart");

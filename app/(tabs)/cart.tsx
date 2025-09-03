@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect,useRef, useState,useCallback } from "react";
 import {
   View,
   Text,
@@ -18,7 +18,9 @@ import {
   addItemToCart, // ✅ make sure you have this in cartApi
 } from "../../services/cartApi";
 import { createBooking } from "../../services/createBooking";
-
+import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCart } from "../../contexts/CartContext";
 // Cart item type
 interface CartItem {
   title: string;
@@ -53,9 +55,11 @@ interface Cart {
 }
 
 export default function Cart() {
+  //  const { cart, fetchCart } = useCart(); // assuming you have fetchCart in context
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const navigation = useNavigation();
+  const didMountRef = useRef(false);
   // 🔹 Fetch cart
   const fetchCart = async () => {
     try {
@@ -68,9 +72,16 @@ export default function Cart() {
     }
   };
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
+ // ✅ Fetch only when user taps on the Cart tab
+ useFocusEffect(
+  useCallback(() => {
+    if (didMountRef.current) {
+      fetchCart(); // run only when coming back via tab press
+    } else {
+      didMountRef.current = true;
+    }
+  }, [])
+);
 
   const refreshCart = async () => {
     try {

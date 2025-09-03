@@ -6,6 +6,7 @@ import { View, ActivityIndicator } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../hooks/AuthContext";
 import React from "react";
+import { CartProvider } from "../contexts/CartContext";
 
 function AuthGate() {
   const { token, loading } = useAuth();
@@ -63,7 +64,9 @@ function AuthGate() {
 export default function RootLayout() {
   return (
     <AuthProvider>
+      <CartProvider>
       <AuthGate />
+      </CartProvider>
     </AuthProvider>
   );
 }
