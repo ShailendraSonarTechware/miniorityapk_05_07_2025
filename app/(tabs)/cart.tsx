@@ -1,4 +1,4 @@
-import React, { useEffect,useRef, useState,useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TextInput,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity,
   Alert,
 } from "react-native";
 import SearchHeader from "../components/SearchHeader";
@@ -21,6 +22,7 @@ import { createBooking } from "../../services/createBooking";
 import { useNavigation } from "@react-navigation/native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCart } from "../../contexts/CartContext";
+import AddressForm from "../components/AddressForm";
 // Cart item type
 interface CartItem {
   title: string;
@@ -60,6 +62,9 @@ export default function Cart() {
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
   const didMountRef = useRef(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [address, setAddress] = useState<any>(null);
   // 🔹 Fetch cart
   const fetchCart = async () => {
     try {
@@ -72,16 +77,16 @@ export default function Cart() {
     }
   };
 
- // ✅ Fetch only when user taps on the Cart tab
- useFocusEffect(
-  useCallback(() => {
-    if (didMountRef.current) {
-      fetchCart(); // run only when coming back via tab press
-    } else {
-      didMountRef.current = true;
-    }
-  }, [])
-);
+  // ✅ Fetch only when user taps on the Cart tab
+  useFocusEffect(
+    useCallback(() => {
+      if (didMountRef.current) {
+        fetchCart(); // run only when coming back via tab press
+      } else {
+        didMountRef.current = true;
+      }
+    }, [])
+  );
 
   const refreshCart = async () => {
     try {
@@ -182,6 +187,45 @@ export default function Cart() {
   return (
     <ScrollView style={styles.container}>
       <SearchHeader />
+
+      {/* address form  */}
+      <View style={styles.addressContainer}>
+        {address ? (
+          <View style={styles.addressCard}>
+            <Text style={styles.addressTitle}>Delivery Address</Text>
+            <Text style={styles.addressName}>{address.name}</Text>
+            <Text style={styles.addressPhone}>{address.phone}</Text>
+            <Text style={styles.addressLine}>
+              {address.address1}{address.address2 ? `, ${address.address2}` : ""}
+            </Text>
+            <Text style={styles.addressLine}>
+              {address.city}, {address.state} - {address.zip}
+            </Text>
+            <Text style={styles.addressLine}>{address.country}</Text>
+
+            {address.default && <Text style={styles.defaultBadge}>Default</Text>}
+          </View>
+        ) : (
+          <Text style={styles.noAddress}>No Address Added</Text>
+        )}
+
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.addBtnText}>
+            {address ? "Edit Address" : "Add Address"}
+          </Text>
+        </TouchableOpacity>
+
+        <AddressForm
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onSave={(addr) => setAddress(addr)}
+        />
+      </View>
+
+
       <Text style={styles.header}>MY CART</Text>
 
       {cart.items.map((item) => (
@@ -265,6 +309,48 @@ export default function Cart() {
       <Pressable style={styles.checkoutButton} onPress={handleCheckout}>
         <Text style={styles.checkoutText}>Proceed To Checkout</Text>
       </Pressable>
+
+
+
+      {/* Terms and Conditions and Privacy Policy */}
+      <View style={styles.termsSection}>
+        <Text style={styles.termsText}>
+          By proceeding with this order, you agree to our
+          <Text style={styles.termsLink}> Terms & Conditions</Text> and
+          <Text style={styles.termsLink}> Privacy Policy</Text>.
+        </Text>
+      </View>
+
+      {/* Footer Image Section */}
+      <View style={styles.footerContainer}>
+        <View style={styles.footerItem}>
+          <Image
+            source={{
+              uri: "https://i.ibb.co/6J80kz5y/7fadd64536b28293db70d663aa9afd29e5db7826.png",
+            }}
+            style={styles.footerLogo}
+          />
+          <Text style={styles.footerText}>Genuine Product</Text>
+        </View>
+        <View style={styles.footerItem}>
+          <Image
+            source={{
+              uri: "https://i.ibb.co/fz5NQfW3/cb83b470a4a674d4310ad441f74a92e3b763477f.png",
+            }}
+            style={styles.footerLogo}
+          />
+          <Text style={styles.footerText}>Support Minority Businesses</Text>
+        </View>
+        <View style={styles.footerItem}>
+          <Image
+            source={{
+              uri: "https://i.ibb.co/60SB2RwH/05ca92f1b294061fa0bcec1fb6b85bca6bcef732.png",
+            }}
+            style={styles.footerLogo}
+          />
+          <Text style={styles.footerText}>Secure Payment</Text>
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -325,5 +411,84 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#007bff",
     textAlign: "right",
+  },
+
+  termsSection: { marginTop: 16, alignItems: "center" },
+  termsText: { fontSize: 14, color: "#555", textAlign: "center" },
+  termsLink: { color: "#ce5f44", fontWeight: "600" },
+
+  footerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingTop: 16,
+    paddingBottom: 32,
+    backgroundColor: "#fff6e0",
+    marginTop: 20,
+    borderRadius: 12,
+  },
+  footerItem: { alignItems: "center", maxWidth: 90 },
+  footerLogo: { width: 50, height: 50, marginBottom: 8, resizeMode: "contain" },
+  footerText: { fontSize: 12, color: "#555", textAlign: "center" },
+  addressContainer: {
+    marginTop: 20,
+  },
+  addressCard: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  addressTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#111827",
+  },
+  addressName: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#1f2937",
+  },
+  addressPhone: {
+    fontSize: 14,
+    color: "#374151",
+    marginBottom: 5,
+  },
+  addressLine: {
+    fontSize: 14,
+    color: "#4b5563",
+  },
+  defaultBadge: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    backgroundColor: "#E07B39",
+    color: "#fff",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  noAddress: {
+    marginBottom: 10,
+    fontSize: 14,
+    color: "#6b7280",
+  },
+  addBtn: {
+    backgroundColor: "#E07B39",
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  addBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });
