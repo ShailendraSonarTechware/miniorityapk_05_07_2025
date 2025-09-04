@@ -1,13 +1,13 @@
 // App.js
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, Image, TextInput, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, Image, TextInput, StyleSheet, TouchableOpacity, FlatList ,  ActivityIndicator,} from 'react-native';
 import { Menu } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { getCategories } from "../../services/serviceService"
 import ProductPreview from '../components/ProductPreviewShort';
 import ServicePreview from '../components/ServicePreviewShort';
-
+import { getServiceCategories } from "../../services/categoryApi"; // ✅ renamed
 type Category = {
   _id: string;
   name: string;
@@ -44,6 +44,9 @@ const vendors = [
 export default function App() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [categories, setCategories] = useState<Category[]>([]);
+    const [serviceCategories, setServiceCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,8 +59,29 @@ export default function App() {
     };
     fetchData();
   }, []);
+useEffect(() => {
+    const fetchServiceCategories = async () => {
+      try {
+        const data = await getServiceCategories();
+        setServiceCategories(data);
+      } catch (error) {
+        console.error("Error fetching service categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServiceCategories();
+  }, []);
 
 
+if (loading) {
+    return (
+      <View style={{ padding: 20, alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#FF8C00" />
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
@@ -118,7 +142,7 @@ export default function App() {
             <Text style={styles.viewAllText}>View All</Text>
           </TouchableOpacity>
         </View>
-        <FlatList
+        {/* <FlatList
           horizontal
           data={serviceFilters}
           keyExtractor={(item) => item}
@@ -142,7 +166,32 @@ export default function App() {
               </Text>
             </TouchableOpacity>
           )}
-        />
+        /> */}
+        <FlatList
+      horizontal
+      data={serviceCategories}
+      keyExtractor={(item) => item._id}
+      showsHorizontalScrollIndicator={false}
+      style={{ paddingHorizontal: 10, marginVertical: 10 }}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          onPress={() => setSelectedCategorySlug(item.slug)}
+          style={[
+            styles.categoryButton,
+            selectedCategorySlug === item.slug && styles.categoryButtonSelected,
+          ]}
+        >
+          <Text
+            style={{
+              color: selectedCategorySlug === item.slug ? "#fff" : "#333",
+              fontWeight: "500",
+            }}
+          >
+            {item.name}
+          </Text>
+        </TouchableOpacity>
+      )}
+    />
 
 
 
@@ -443,6 +492,20 @@ const styles = StyleSheet.create({
   },
   authorInfo: {
     flex: 1,
-  }
+  },
+  categoryButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginRight: 10,
+  },
+  categoryButtonSelected: {
+    // backgroundColor: "#FF8C00",
+    // borderColor: "#FF8C00",
+    backgroundColor: "#000",
+    borderColor: "#000",
+  },
 
 });
