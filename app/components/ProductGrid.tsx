@@ -57,6 +57,8 @@ const ProductGrid = () => {
   const renderItem = ({ item }: { item: any }) => {
     const avgRating = item?.variants?.[0]?.averageRating ?? 0;
     const reviewCount = item?.variants?.[0]?.totalReviews ?? 0;
+    const price = item?.firstEligible?.price ?? null;
+  const salePrice = item?.firstEligible?.salePrice ?? null;
 
     return (
       <TouchableOpacity
@@ -66,10 +68,8 @@ const ProductGrid = () => {
             pathname: '/products/[productId]',
             params: {
               productId: item._id,
-              title: item.title,
-              price:
-                item?.variants?.[0]?.sizes?.[0]?.salePrice ??
-                item?.variants?.[0]?.sizes?.[0]?.price,
+            title: item.title,
+            price: salePrice ?? price,
             },
           })
         }
@@ -86,23 +86,16 @@ const ProductGrid = () => {
           <Text style={styles.reviewText}>({reviewCount})</Text>
         </View>
 
-        <Text style={styles.priceRow}>
-  {item?.variants?.[0]?.sizes?.[0]?.salePrice &&
-   item?.variants?.[0]?.sizes?.[0]?.salePrice < item?.variants?.[0]?.sizes?.[0]?.price ? (
-    <>
-      <Text style={styles.oldPrice}>
-        ${item?.variants?.[0]?.sizes?.[0]?.price}
-      </Text>
-      <Text style={styles.salePrice}>
-        ${item?.variants?.[0]?.sizes?.[0]?.salePrice}
-      </Text>
-    </>
-  ) : (
-    <Text style={styles.salePrice}>
-      ${item?.variants?.[0]?.sizes?.[0]?.price ?? 'N/A'}
-    </Text>
-  )}
-</Text>
+        <View style={styles.priceRow}>
+        {salePrice && salePrice < price ? (
+          <>
+            <Text style={styles.oldPrice}>${price}</Text>
+            <Text style={styles.salePrice}>${salePrice}</Text>
+          </>
+        ) : (
+          <Text style={styles.salePrice}>${price ?? 'N/A'}</Text>
+        )}
+      </View>
       </TouchableOpacity>
     );
   };
@@ -116,7 +109,7 @@ const ProductGrid = () => {
   }
 
   return (
-    // <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container}>
     <>
       <SearchBar />
       <FilterBar />
@@ -130,7 +123,7 @@ const ProductGrid = () => {
         showsVerticalScrollIndicator={false}
       />
       </>
-    // </SafeAreaView>
+     </SafeAreaView>
   );
 };
 
@@ -138,8 +131,8 @@ export default ProductGrid;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 12,
-    paddingTop: 12,
+    // paddingHorizontal: 12,
+    // paddingTop: 12,
     backgroundColor: '#fff',
   },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },

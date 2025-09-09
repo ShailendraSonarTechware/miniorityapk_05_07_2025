@@ -105,7 +105,7 @@ export default function ProductDetailScreen() {
       : 0;
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: "#fff" }]}>
 
 
 
@@ -287,7 +287,7 @@ export default function ProductDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
+  container: { padding: 16 , backgroundColor: "#fff" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   image: { width: "100%", height: 300, borderRadius: 8 },
   title: { fontSize: 18, fontWeight: "bold", marginTop: 12 },

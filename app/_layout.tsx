@@ -1,63 +1,69 @@
 // app/_layout.tsx
 import { Stack } from "expo-router";
-// import { StatusBar } from "expo-status-bar";
-import { StatusBar } from "react-native";
-import { View, ActivityIndicator } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { View, ActivityIndicator } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { AuthProvider, useAuth } from "../hooks/AuthContext";
-import React from "react";
 import { CartProvider } from "../contexts/CartContext";
+import React from "react";
 
 function AuthGate() {
   const { token, loading } = useAuth();
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#fff", // paints behind status bar
+        }}
+      >
+        <StatusBar style="light" /> 
         <ActivityIndicator size="large" color="#00A9CB" />
       </View>
     );
   }
 
-  // 🔒 No token → only auth stack
-  if (!token) {
-    return (
-      <>
-       <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <StatusBar backgroundColor="#000" barStyle="light-content" />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="auth/Login" />
-          <Stack.Screen name="auth/Signup" />
-          <Stack.Screen name="auth/SignupVendor" />
-          <Stack.Screen name="auth/ForgotPassword" />
-        </Stack>
-        </SafeAreaView>
-    </SafeAreaProvider>
-      </>
-    );
-  }
-
-  // 🔑 With token → everything else
   return (
-    <>
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor="#000" barStyle="light-content" />
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Onboarding Screens */}
-        <Stack.Screen name="onboarding/Onboarding1" />
-        <Stack.Screen name="onboarding/Onboarding2" />
-        <Stack.Screen name="onboarding/Onboarding3" />
-        <Stack.Screen name="onboarding/Onboarding4" />
+      {/* SafeArea paints black under the notch/statusbar */}
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+        <StatusBar style="light" />
 
-        {/* Main Products & Tabs */}
-        <Stack.Screen name="products/index" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-       </SafeAreaView>
+        {!token ? (
+          // 🔒 Auth stack
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: "#000" },
+            }}
+          >
+            <Stack.Screen name="auth/Login" />
+            <Stack.Screen name="auth/Signup" />
+            <Stack.Screen name="auth/SignupVendor" />
+            <Stack.Screen name="auth/ForgotPassword" />
+          </Stack>
+        ) : (
+          // 🔑 Main app
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: "#000" },
+            }}
+          >
+            <Stack.Screen name="onboarding/Onboarding1" />
+            <Stack.Screen name="onboarding/Onboarding2" />
+            <Stack.Screen name="onboarding/Onboarding3" />
+            <Stack.Screen name="onboarding/Onboarding4" />
+
+            <Stack.Screen name="products/index" />
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        )}
+      </SafeAreaView>
     </SafeAreaProvider>
-    </>
   );
 }
 
@@ -65,7 +71,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <CartProvider>
-      <AuthGate />
+        <AuthGate />
       </CartProvider>
     </AuthProvider>
   );

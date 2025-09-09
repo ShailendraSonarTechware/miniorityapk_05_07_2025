@@ -27,8 +27,8 @@ const ProductPreview = () => {
   }, []);
 
   const renderItem = ({ item }: { item: any }) => {
-    const price = item?.variants?.[0]?.sizes?.[0]?.price ?? 0;
-    const salePrice = item?.variants?.[0]?.sizes?.[0]?.salePrice ?? null;
+    const price = item?.firstEligible?.price ?? null;
+  const salePrice = item?.firstEligible?.salePrice ?? null;
 
     return (
       <TouchableOpacity
