@@ -2,11 +2,19 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import * as Linking from "expo-linking";
 
 export default function Onboarding4() {
   const handleLogin = async () => {
     await AsyncStorage.setItem('onboardingCompleted', 'true');
     router.replace('/auth/Login');
+  };
+
+  const handleVendorLogin = () => {
+    Linking.openURL("https://app.minorityownedbusiness.info/login?type=vendor");
+  };
+  const handleVendorSignup = () => {
+    Linking.openURL("https://app.minorityownedbusiness.info/signup?type=vendor");
   };
 
   return (
@@ -29,7 +37,7 @@ export default function Onboarding4() {
         <TouchableOpacity style={styles.customerBtn} onPress={handleLogin}>
           <Text style={styles.customerText}>Login As Customer</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.vendorBtn} onPress={handleLogin}>
+        <TouchableOpacity style={styles.vendorBtn} onPress={handleVendorLogin}>
           <Text style={styles.vendorText}>Login As Vendor</Text>
         </TouchableOpacity>
       </View>
@@ -39,11 +47,11 @@ export default function Onboarding4() {
           New Customer? <Text style={styles.underline}>Create Account</Text>
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/auth/SignupVendor')}>
-  <Text style={styles.link}>
-    <Text style={styles.underline}>Or Become A Vendor</Text>
-  </Text>
-</TouchableOpacity>
+      <TouchableOpacity onPress={handleVendorSignup}>
+        <Text style={styles.link}>
+          <Text style={styles.underline}>Or Become A Vendor</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
