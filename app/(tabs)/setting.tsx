@@ -20,7 +20,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from "../../hooks/AuthContext";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AccountSettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -46,8 +46,8 @@ export default function AccountSettingsScreen() {
 
   const handleLogout = async () => {
     try {
-      // 1. Clear async storage or token
-      // await AsyncStorage.removeItem('authToken'); // or your token key
+      // 1. Clear auth token (and optionally other keys like user data)
+    await AsyncStorage.removeItem("authToken");
 
       // 2. Optionally clear any global user state
       // dispatch({ type: 'LOGOUT' }); // if using context/redux

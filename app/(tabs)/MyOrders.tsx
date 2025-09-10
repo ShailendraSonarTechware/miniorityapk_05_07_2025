@@ -164,6 +164,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import SearchHeader from "../components/SearchHeader";
 import { useRouter } from "expo-router";
+import { getOrders } from "../../services/ordersApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MyOrdersScreen() {
@@ -175,32 +176,14 @@ export default function MyOrdersScreen() {
   const [timeFilter, setTimeFilter] = useState("");
 
   const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) {
-        console.error("No token found");
-        setOrders([]);
-        return;
-      }
-
-      let url = `https://api.minorityownedbusiness.info/api/orders/user?status=${statusFilter}&time=${timeFilter}`;
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      setOrders(data.orders || []);
-    } catch (err) {
-      console.error("Error fetching orders", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const orders = await getOrders(statusFilter, timeFilter);
+    setOrders(orders);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchOrders();
