@@ -29,7 +29,7 @@ function AuthGate() {
   return (
     <SafeAreaProvider>
       {/* SafeArea paints black under the notch/statusbar */}
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#D25A43" }}>
         <StatusBar style="light" />
 
         {!token ? (
@@ -50,7 +50,7 @@ function AuthGate() {
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: "#000" },
+              contentStyle: { backgroundColor: "#D25A43" },
             }}
           >
             <Stack.Screen name="onboarding/Onboarding1" />
