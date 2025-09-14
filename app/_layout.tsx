@@ -5,6 +5,7 @@ import { View, ActivityIndicator } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { AuthProvider, useAuth } from "../hooks/AuthContext";
 import { CartProvider } from "../contexts/CartContext";
+import { StripeProvider } from '@stripe/stripe-react-native';
 import React from "react";
 
 function AuthGate() {
@@ -71,7 +72,9 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <CartProvider>
+        <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PK!}>
         <AuthGate />
+        </StripeProvider>
       </CartProvider>
     </AuthProvider>
   );

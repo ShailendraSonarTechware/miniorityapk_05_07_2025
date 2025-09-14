@@ -33,12 +33,20 @@ const AddressForm: React.FC<AddressFormProps> = ({ visible, onClose, onSave }) =
   };
 
   const handleSave = () => {
-    if (!form.name || !form.phone || !form.address1 || !form.city || !form.state || !form.zip || !form.country) {
+    if (
+      !form.name ||
+      !form.phone ||
+      !form.address1 ||
+      !form.city ||
+      !form.state ||
+      !form.zip ||
+      !form.country
+    ) {
       alert("Please fill all required fields (*)");
       return;
     }
-    onSave(form);
-    onClose();
+    onSave(form); // Save the address to the parent component
+    onClose(); // Close the modal
   };
 
   return (
