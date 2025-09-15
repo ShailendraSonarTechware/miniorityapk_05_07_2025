@@ -40,6 +40,12 @@ Have 2 diffrent thing
 
 
 
+# Deploy in android
+npx expo prebuild - to create android folder
+-- upload as open project in android studio and select that android folder in root project
+
+npx expo run:android
+
 
 
 

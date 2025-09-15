@@ -295,7 +295,7 @@ export default function Cart() {
       <TouchableOpacity
         style={[styles.checkoutButton, (!ready || loadingPay) && { opacity: 0.5 }]}
         onPress={handleStripeCheckout}
-        disabled={loadingPay || !ready}
+        disabled={loadingPay} 
       >
         <Text style={styles.checkoutText}>
           {loadingPay ? "Processing..." : "Pay Now"}
