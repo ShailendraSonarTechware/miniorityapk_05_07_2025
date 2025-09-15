@@ -193,7 +193,8 @@ export default function Cart() {
       refreshCart();
 
       // Navigate to OrderSuccess screen after payment
-      router.push(`../OrderSuccess/${res.orderId}/${res.groupOrderId}`);
+      // router.push(`../OrderSuccess/${res.orderId}/${res.groupOrderId}`);
+      router.push(`../OrderSuccess/${res.clientSecret}`);
     } catch (e: any) {
       console.error(e);
       Alert.alert("Payment Error", "Something went wrong with your payment.");
