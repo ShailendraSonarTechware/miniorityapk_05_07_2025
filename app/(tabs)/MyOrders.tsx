@@ -147,25 +147,24 @@
 //     // alignItems: 'center',
 //   },
 // });
-
-
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
-  TouchableOpacity,
   StyleSheet,
   ScrollView,
   Pressable,
   ActivityIndicator,
+  Alert,
+  TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import SearchHeader from "../components/SearchHeader";
 import { useRouter } from "expo-router";
 import { getOrders } from "../../services/ordersApi";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MyOrdersScreen() {
   const router = useRouter();
@@ -176,14 +175,14 @@ export default function MyOrdersScreen() {
   const [timeFilter, setTimeFilter] = useState("");
 
   const fetchOrders = async () => {
-  setLoading(true);
-  try {
-    const orders = await getOrders(statusFilter, timeFilter);
-    setOrders(orders);
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    try {
+      const orders = await getOrders(statusFilter, timeFilter);
+      setOrders(orders);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -196,6 +195,46 @@ export default function MyOrdersScreen() {
       month: "short",
       year: "numeric",
     });
+  };
+
+  const cancelOrder = async (orderId: string) => {
+    try {
+      setLoading(true);
+       const token = await AsyncStorage.getItem("authToken"); // 🔑 get token
+    if (!token) throw new Error("User not authenticated");
+      const res = await fetch(
+        `https://api.mosaicbizhub.com/api/orders/${orderId}/cancel`,
+        {
+          method: "POST", // API uses POST for cancel
+          headers: {
+            "Content-Type": "application/json",
+             Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to cancel order");
+      }
+
+      Alert.alert("Success", "Order has been cancelled.");
+      fetchOrders(); // refresh orders
+    } catch (err: any) {
+      Alert.alert("Error", err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmCancel = (orderId: string) => {
+    Alert.alert(
+      "Cancel Order",
+      "Are you sure you want to cancel this order?",
+      [
+        { text: "No", style: "cancel" },
+        { text: "Yes", style: "destructive", onPress: () => cancelOrder(orderId) },
+      ]
+    );
   };
 
   return (
@@ -313,17 +352,16 @@ export default function MyOrdersScreen() {
                     {order.currency} {order.totalAmount}
                   </Text>
 
-                  {/* <TouchableOpacity style={styles.reviewBtn}>
-                    <Text style={styles.reviewText}>Add Review</Text>
-                    {[...Array(5)].map((_, idx) => (
-                      <Ionicons
-                        key={idx}
-                        name="star-outline"
-                        size={18}
-                        color="#bbb"
-                      />
-                    ))}
-                  </TouchableOpacity> */}
+                  {/* Cancel Button (only show if not already cancelled/delivered) */}
+                  {order.status !== "cancelled" &&
+                    order.status !== "delivered" && (
+                      <TouchableOpacity
+                        style={styles.cancelBtn}
+                        onPress={() => confirmCancel(order._id)}
+                      >
+                        <Text style={styles.cancelText}>Cancel Order</Text>
+                      </TouchableOpacity>
+                    )}
                 </View>
               </View>
             </Pressable>
@@ -400,7 +438,20 @@ const styles = StyleSheet.create({
   orderTitle: { fontSize: 15, fontWeight: "600", marginBottom: 4, color: "#222" },
   orderDetails: { fontSize: 13, color: "#666", marginBottom: 2 },
   amountText: { fontSize: 15, fontWeight: "700", color: "#C94F3D", marginTop: 3 },
-  reviewBtn: { flexDirection: "row", alignItems: "center", marginTop: 8 },
-  reviewText: { fontSize: 13, color: "#444", marginRight: 6 },
   item: { borderRadius: 14 },
+
+  // Cancel button
+  cancelBtn: {
+    marginTop: 10,
+    backgroundColor: "#E53935",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+  },
+  cancelText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+  },
 });
